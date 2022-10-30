@@ -2,10 +2,12 @@ version: '3'
 services:
   yolov5lst:
     image: ultralytics/yolov5:latest
+    runtime: nvidia #GPU有効
     volumes:
       - ./data:/usr/src/app/mydata #学習用のデータ
-      - ./result:/usr/src/app/runs/detect #判別結果の出力先
+      - ./train_result:usr/src/app/runs/exp2/weights #学習結果の出力先
+      - ./detect_result:/usr/src/app/runs/detect #判別結果の出力先
     tty: true #バックグラウンドで起動  
-    shm_size: '2gb' #シェアードメモリ不足で落ちる対策
+    shm_size: '6gb' #メモリ不足で落ちる対策
     ports:
       - 6006:6006 #tensorboard用
