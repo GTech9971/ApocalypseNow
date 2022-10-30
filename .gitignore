@@ -1,2 +1,8 @@
 
 .DS_Store
+*.png
+*.jpg
+
+/yolo_works/data/
+/yolo_works/targetsite/
+/yolo_works/result/
