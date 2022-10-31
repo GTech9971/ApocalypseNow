@@ -2,7 +2,7 @@ version: '3'
 services:
   yolov5lst:
     image: ultralytics/yolov5:latest
-    runtime: nvidia #GPU有効
+    working_dir: /usr/src/app
     volumes:
       - ./data:/usr/src/app/mydata #学習用のデータ
       - ./train_result:/usr/src/app/runs/exp2/weights #学習結果の出力先
@@ -11,3 +11,10 @@ services:
     shm_size: '6gb' #メモリ不足で落ちる対策
     ports:
       - 6006:6006 #tensorboard用
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia # GPU対応
+              count: 1
+              capabilities: [ gpu ]
