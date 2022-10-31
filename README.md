@@ -158,15 +158,35 @@ tensorboard --logdir runs/train
 
 - 閲覧はホストマシンで[localhost:6006](localhost:6006)に入れば表示される。
 
-- 学習とtensorboardの起動を一緒に行いたい場合は、以下のコマンドを実行する
+- 学習とtensorboardの起動を一緒に行いたい場合は、以下のコマンドを実行する(バグで学習結果の保存が終わらない時があるので注意)
 
 ```
 python train.py --img 640 --batch 16 --epochs 200 --data {sample.yamlのpath} --weights yolov5s.pt | tensorboard --logdir runs/train
 ```
 
 ### 学習結果
-- ホストの以下のフォルダに学習結果が出力される
+- コンテナ以下のフォルダに学習結果が出力される
 
 ```
-/detect_result
+/usr/src/app/runs/train/exp/weights
+```
+
+## yolov5 識別
+### 画像の識別
+先ほどの学習でptファイルが保存されたので、それを使用して以下のコマンドを実行する
+
+```
+python detect.py --weights 学習結果.pt --source 画像のパス
+```
+
+学習結果は、コンテナ内の以下に保存される
+
+```
+/usr/src/app/runs/detect/exp
+```
+
+また、上記パスをバインドしているためホストの以下のパスにも反映される
+
+```
+./detect_result/
 ```
