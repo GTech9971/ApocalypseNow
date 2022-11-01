@@ -1,0 +1,13 @@
+version: '3'
+services:
+  yolov5lst-cpu:
+    image: ultralytics/yolov5:latest
+    working_dir: /usr/src/app
+    volumes:
+      - ./data:/usr/src/app/mydata #学習用のデータ
+      - ./detect_result:/usr/src/app/runs/detect #判別結果の出力先
+    tty: true #バックグラウンドで起動  
+    shm_size: '2gb' #メモリ不足で落ちる対策
+    ports:
+      - 6006:6006 #tensorboard用
+      - 8000:8000 #fastapi用
