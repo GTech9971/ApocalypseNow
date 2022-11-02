@@ -4,7 +4,11 @@ from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, File
 
+import uvicorn
+
 import detect
+
+
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # api-server root directory
@@ -60,3 +64,12 @@ def load_label(path: str):
             return line
     except Exception as e:
         return e
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        app="main:app",
+        host="0.0.0.0",
+        reload=True,
+        port=8000,
+        log_level="debug",)
