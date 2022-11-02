@@ -190,3 +190,18 @@ python detect.py --weights 学習結果.pt --source 画像のパス
 ```
 ./detect_result/
 ```
+
+## ApocalypseNow API-Server構築
+/api-server/Dockerfileをビルドしてイメージを生成する。
+
+```
+docker build -t apocalypse_now . --no-cache
+```
+
+/api-server/docker-compose.yamlをupするとapi-serverが立ち上がる。
+[http://localhost:8000/docs](http://localhost:8000/docs)へのアクセスでAPIのドキュメントが閲覧できる。
+
+
+```
+docker compose -f "docker-compose.yaml" up -d --build 
+```

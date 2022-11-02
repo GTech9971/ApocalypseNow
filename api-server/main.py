@@ -1,13 +1,8 @@
-# start server  $uvicorn main:app --reload
-
 from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, File
 
-import uvicorn
-
 import detect
-
 
 
 FILE = Path(__file__).resolve()
@@ -44,9 +39,11 @@ def upload_target(file: UploadFile = File(...)):
         file.file.close()
 
     # yoloで座標取得
-    detect.run(weights=TARGET_SITE_WEIGHT_PATH, source=save_path, save_txt=True)
+    detect.run(weights=TARGET_SITE_WEIGHT_PATH,
+               source=save_path, save_txt=True)
     # 出力結果を読み取る
-    label_path = Path(YOLO_APP_ROOT, "runs/detect/exp/label/", file.filename.replace(".png", ".txt"))
+    label_path = Path(YOLO_APP_ROOT, "runs/detect/exp/label/",
+                      file.filename.replace(".png", ".txt"))
     result = load_label(label_path)
 
     return {"message": f"upload success {file.filename}", "rect": result}
@@ -64,12 +61,3 @@ def load_label(path: str):
             return line
     except Exception as e:
         return e
-
-
-if __name__ == "__main__":
-    uvicorn.run(
-        app="main:app",
-        host="0.0.0.0",
-        reload=True,
-        port=8000,
-        log_level="debug",)
