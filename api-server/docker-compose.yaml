@@ -1,7 +1,7 @@
 version: '3'
 services:
   apocalypse_now:
-    image: apocalypse_now:latest
+    image: george9971/apocalypse_now:latest
     working_dir: /usr/src/app/ApocalypseNow/api-server/
     tty: true #バックグラウンドで起動  
     shm_size: '2gb' #メモリ不足で落ちる対策
