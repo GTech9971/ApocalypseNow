@@ -195,7 +195,7 @@ python detect.py --weights 学習結果.pt --source 画像のパス
 /api-server/Dockerfileをビルドしてイメージを生成する。
 
 ```
-docker build -t apocalypse_now . --no-cache
+docker build -t george9971/apocalypse_now . --no-cache
 ```
 
 /api-server/docker-compose.yamlをupするとapi-serverが立ち上がる。

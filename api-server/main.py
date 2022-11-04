@@ -3,12 +3,14 @@ from pathlib import Path
 from fastapi import FastAPI, UploadFile, File
 
 import detect_targetsite
+import projective_transform
 
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # api-server root directory
 
-UPLOAD_TARGETSITE_PATH = Path(ROOT, "upload", "targetsite") # アップロードされた的本体の画像データ
+UPLOAD_TARGETSITE_PATH = Path(
+    ROOT, "upload", "targetsite")  # アップロードされた的本体の画像データ
 
 TARGET_SITE_WEIGHT_PATH = Path(ROOT, "weights", "targetsite.pt")  # 的本体の学習結果データ
 SITE_WEIGHT_PATH = Path(ROOT, "weights", "site.pt")  # 的の学習結果データ
@@ -30,7 +32,7 @@ def read_item(item_id: int, q: str = None):
 
 @app.post("/upload_target")
 def upload_target(file: UploadFile = File(...)):
-    try:        
+    try:
         contents = file.file.read()
         save_path = Path(UPLOAD_TARGETSITE_PATH, file.filename)
         with open(save_path, "wb") as f:
@@ -42,25 +44,24 @@ def upload_target(file: UploadFile = File(...)):
 
     # yoloで座標取得
     detect_targetsite.run(weights=TARGET_SITE_WEIGHT_PATH,
-               source=save_path, save_txt=True, exist_ok=True)
+                          source=save_path, save_txt=True, exist_ok=True)
     # 出力結果を読み取る
     label_path = Path(YOLO_APP_ROOT, "runs/detect/exp/labels/",
                       file.filename.replace(".png", ".txt"))
     result = load_label(label_path)
 
+    projective_transform.exec(img_path=save_path, rect=result)
+
     return {"message": f"upload success {file.filename}", "rect": result}
 
 
-'''
-ラベルを読み込む
-'''
-
-
 def load_label(label_path: str):
+    'ラベルを読み込む'
+
     try:
-        with open(label_path, "r") as f:         
+        with open(label_path, "r") as f:
             result = f.readlines()
-            if(len(result) == 0):
+            if len(result) == 0:
                 return []
 
             yolo_data = result[0].split(" ")
@@ -70,7 +71,7 @@ def load_label(label_path: str):
             y = float(yolo_data[2])
             w = float(yolo_data[3])
             h = float(yolo_data[4])
-            
+
             return [label, x, y, w, h]
 
     except Exception as e:
