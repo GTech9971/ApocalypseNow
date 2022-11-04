@@ -46,7 +46,7 @@ def upload_target(file: UploadFile = File(...)):
     detect_targetsite.run(weights=TARGET_SITE_WEIGHT_PATH,
                           source=save_path, save_txt=True, exist_ok=True)
     # 出力結果を読み取る
-    label_path = Path(YOLO_APP_ROOT, "runs/detect/exp/labels/",
+    label_path = Path(ROOT, "runs/detect/exp/labels/",
                       file.filename.replace(".png", ".txt"))
     result = load_label(label_path)
 

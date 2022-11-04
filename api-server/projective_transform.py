@@ -32,22 +32,23 @@ def transform(img: cv2.Mat, cnt):
     src = np.float32(list(map(lambda x: x[0], approx)))
     dst = np.float32([[0, 0], [0, WIDTH], [HEIGHT, WIDTH], [HEIGHT, 0]])
 
+    #射影変換不要なレベルだとエラーで落ちる
+
     project_matrix = cv2.getPerspectiveTransform(src, dst)
 
     transformed = cv2.warpPerspective(img, project_matrix, (HEIGHT, WIDTH))
     return transformed
 
 
-def exec(img_path: str, rect: list):
-
+def exec(img_path: str, rect: list):    
     # load img
     img: cv2.Mat = cv2.imread(img_path)
 
     # 画像トリミング
-    x: int = rect[1]
-    y: int = rect[2]
-    w: int = rect[3]
-    h: int = rect[4]
+    x: int = int(rect[1])
+    y: int = int(rect[2])
+    w: int = int(rect[3])
+    h: int = int(rect[4])
     img = img[y:h, x:w]
 
     # グレイスケール
@@ -62,4 +63,4 @@ def exec(img_path: str, rect: list):
 
     img = transform(img, cnt)
 
-    cv2.imwrite(img_path + "dst.png", img)
+    cv2.imwrite(img_path, img)
