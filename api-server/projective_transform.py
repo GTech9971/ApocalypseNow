@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+from models.DetectInfo import DetectInfo
 
 # 2値化
 def calc_threshold(gray_img: cv2.Mat) -> int:
@@ -40,15 +41,12 @@ def transform(img: cv2.Mat, cnt):
     return transformed
 
 
-def exec(img_path: str, rect: list):    
+def exec(img_path: str, detect_info: DetectInfo):    
     # load img
     img: cv2.Mat = cv2.imread(img_path)
 
     # 画像トリミング
-    x: int = int(rect[1])
-    y: int = int(rect[2])
-    w: int = int(rect[3])
-    h: int = int(rect[4])
+    x,y,w,h  = detect_info.rect    
     img = img[y:h, x:w]
 
     # グレイスケール

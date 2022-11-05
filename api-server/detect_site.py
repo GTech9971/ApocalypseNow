@@ -163,7 +163,7 @@ def run(
                         #line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format                       #削除
                         with open(f'{txt_path}.txt', 'a') as f:
                             #f.write(('%g ' * len(line)).rstrip() % line + '\n')                                        #削除
-                            result = torch.tensor(xyxy).view(1, 4)[0]                                                   #追加  
+                            result = torch.tensor(xyxy).view(1, 4)[0]                                                   #追加  TODO 複数あった場合に対応できるかわからん
                             c = int(cls)  # integer class 追加
                             f.write(f"{c} {result[0]} {result[1]} {result[2]} {result[3]}" + '\n')                      #追加
 
