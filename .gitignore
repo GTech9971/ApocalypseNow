@@ -3,6 +3,8 @@
 *.png
 *.jpg
 
+!/api-server/resources/*.png
+
 /yolo_works/data/
 /yolo_works/targetsite/
 /yolo_works/result/
