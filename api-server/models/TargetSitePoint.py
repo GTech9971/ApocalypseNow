@@ -1,6 +1,6 @@
 import cv2
 
-from HitPoint import HitPoint
+from models.HitPoint import HitPoint
 
 # 最大ポイント
 MAX_POINT: int = 10
@@ -24,20 +24,21 @@ class TargetSitePoint(object):
         """
         self.hit_point_list.append(pt)
 
-    def print_point_list(self):
+    def get_point_list(self) -> str:
         """
         ヒットポイントリストのポイントを表示させる
         """
-        print(f"TargetSite Hit point info id:={self.site_id}")
+        dst: str = f"TargetSite Hit point info id := {self.site_id}"
 
         for pt in self.hit_point_list:
             for point_n in reversed(range(MIN_POINT, MAX_POINT + 1)):
                 result: bool = self.exists_point_n(point_n, pt)
                 if result:
-                    print(f"(x={pt.x}, y={pt.y} point={point_n})")
+                    dst += f"(x={pt.x}, y={pt.y} point={point_n})"
                     continue
 
-        print("done.")
+        dst += "done."
+        return dst
 
     def exists_point(self, contour, pt: HitPoint) -> bool:
         """
@@ -65,7 +66,6 @@ class TargetSitePoint(object):
             else:
                 return False
 
-            
         exists_b: bool = self.exists_point(
             self.contours[point_n - MIN_POINT + 1], pt)
 
