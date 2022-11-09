@@ -1,0 +1,8 @@
+version: '3'
+services:
+  apocalypse_now:
+    image: george9971/apocalypse_now:latest
+    working_dir: /usr/src/app/ApocalypseNow/api-server/
+    # volumes:
+    #   - ./detect_result:/usr/src/app/runs/detect #判別結果の出力先
+    tty: true #バックグラウンドで起動  
