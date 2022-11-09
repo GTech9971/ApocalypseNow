@@ -13,7 +13,7 @@ from pathlib import Path
 FILE = Path(__file__).resolve()
 # api-server root directory
 ROOT = FILE.parents[1]
-DEFAULT_IMG_PATH = Path(ROOT, "resources", "sample1.png")
+DEFAULT_IMG_PATH: str = str(Path(ROOT, "resources", "sample1.png"))
 
 
 class DetectHitPoint(object):
@@ -21,8 +21,7 @@ class DetectHitPoint(object):
     ターゲットサイトにヒットした点数を取得する
     """
 
-    def __init__(self, site_id: int = 0, img_path: str = "../resources/sample1.png") -> None:
-        print(DEFAULT_IMG_PATH)
+    def __init__(self, site_id: int = 0, img_path: str = DEFAULT_IMG_PATH) -> None:
         self.site_id = site_id
         self.img_path = img_path
 
