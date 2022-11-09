@@ -6,3 +6,5 @@ services:
     # volumes:
     #   - ./detect_result:/usr/src/app/runs/detect #判別結果の出力先
     tty: true #バックグラウンドで起動  
+    ports:
+      - 8000:8000 #api-server用
