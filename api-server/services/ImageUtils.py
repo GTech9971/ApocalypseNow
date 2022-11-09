@@ -1,7 +1,7 @@
 import base64
 import cv2
 
-from models.DetectInfo import DetectInfo
+from entities.DetectInfo import DetectInfo
 
 
 def trim_img(img_path: str, detect_info: DetectInfo) -> cv2.Mat:

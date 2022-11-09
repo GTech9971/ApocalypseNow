@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from models.DetectInfo import DetectInfo
+from entities.DetectInfo import DetectInfo
 from services.ImageUtils import trim_img
 
 

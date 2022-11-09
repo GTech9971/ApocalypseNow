@@ -1,6 +1,6 @@
 import cv2
 
-from models.HitPoint import HitPoint
+from entities.HitPoint import HitPoint
 
 # 最大ポイント
 MAX_POINT: int = 10

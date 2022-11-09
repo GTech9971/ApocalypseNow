@@ -8,7 +8,7 @@ from services.DetectHitPoint import DetectHitPoint
 from services.ProjectiveTransform import ProjectiveTransform
 from services.ImageUtils import trim_img, img2base64
 
-from models.DetectInfo import DetectInfo
+from entities.DetectInfo import DetectInfo
 
 
 FILE = Path(__file__).resolve()

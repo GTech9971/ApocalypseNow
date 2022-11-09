@@ -3,8 +3,8 @@ find_contoursにおける輪郭の取得
 https://www.learning-nao.com/?p=2020
 """
 
-from models.HitPoint import HitPoint
-from models.TargetSitePoint import TargetSitePoint
+from entities.HitPoint import HitPoint
+from entities.TargetSitePoint import TargetSitePoint
 
 import cv2
 
