@@ -1,10 +1,35 @@
 version: '3'
 services:
-  apocalypse_now:
-    image: george9971/apocalypse_now:latest
+  ap2n-db:
+    #api-server db
+    platform: linux/x86_64 # m1チップ対策
+    image: mysql:5.7
+    container_name: ap2n-db
+    networks:
+      - ap2nnet
+    volumes:
+      - ap2n-db-vol:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: ap2n
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  ap2n-server:
+    #api-server
+    depends_on:
+      - ap2n-db
+    image: george9971/ap2n:latest
+    container_name: ap2n-server
+    networks:
+      - ap2nnet
     working_dir: /usr/src/app/ApocalypseNow/api-server/
-    # volumes:
-    #   - ./detect_result:/usr/src/app/runs/detect #判別結果の出力先
     tty: true #バックグラウンドで起動  
     ports:
       - 8000:8000 #api-server用
+networks:
+  ap2nnet:
+volumes:
+  ap2n-db-vol:

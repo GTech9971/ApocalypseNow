@@ -1,1 +1,1 @@
-docker build -t george9971/apocalypse_now:latest . --no-cache
+docker build -t george9971/ap2n:latest . --no-cache
