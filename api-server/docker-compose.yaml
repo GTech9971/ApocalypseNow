@@ -9,6 +9,7 @@ services:
       - ap2nnet
     volumes:
       - ap2n-db-vol:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d # 初期sql実行
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
