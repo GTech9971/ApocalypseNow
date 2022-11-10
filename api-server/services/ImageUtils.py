@@ -1,19 +1,41 @@
 import base64
 import cv2
 
+from pathlib import Path
+
+from fastapi import UploadFile
 from entities.DetectInfo import DetectInfo
 
 
-def trim_img(img_path: str, detect_info: DetectInfo) -> cv2.Mat:
-    img: cv2.Mat = cv2.imread(img_path)
+class ImageUtils(object):
 
-    # 画像トリミング
-    x, y, w, h = detect_info.rect
-    img = img[y:h, x:w]
+    def saveImg(file: UploadFile, save_path: Path):
+        """
+        画像ファイルの保存
+        """
+        try:
+            contents = file.file.read()
+            with open(save_path, "wb") as f:
+                f.write(contents)
+        except Exception as e:
+            raise e
+        finally:
+            file.file.close()
 
-    return img
+    def trimImg(img: cv2.Mat, detect_info: DetectInfo) -> cv2.Mat:
+        """
+        画像トリミング
+        """
 
+        x, y, w, h = detect_info.rect
+        return img[y:h, x:w]
 
-def img2base64(img: cv2.Mat) -> str:
-    _, encodeed = cv2.imencode(".png", img)
-    return base64.b64encode(encodeed).decode("ascii")
+    def resizeImg(img: cv2.Mat, width: int, height: int) -> cv2.Mat:
+        """
+        画像リサイズ
+        """
+        return cv2.resize(img, dsize=(width, height))
+
+    def img2base64(img: cv2.Mat) -> str:
+        _, encodeed = cv2.imencode(".png", img)
+        return base64.b64encode(encodeed).decode("ascii")

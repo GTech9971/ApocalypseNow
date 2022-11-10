@@ -1,6 +1,6 @@
-class HitPoint(object):
+class Point(object):
     """
-    ヒットした座標
+    座標
     """
 
     def __init__(self, x: int, y: int) -> None:

@@ -1,3 +1,6 @@
+from entities.Point import Point
+
+
 class DetectInfo(object):
     "yoloで取得した情報(ラベル、座標)を格納する"
 
@@ -16,6 +19,13 @@ class DetectInfo(object):
     def rect(selft) -> tuple:
         "座標を返す x,y,w,h"
         return (selft._x, selft._y, selft._w, selft._h)
+
+    # TODO ロジックの実装
+    def convert2CenterPoint(self) -> Point:
+        """
+        中心座標にして返す
+        """
+        pass
 
     def loadLabels(label_path: str) -> list:
         """
