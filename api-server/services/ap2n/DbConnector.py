@@ -6,7 +6,7 @@ class DbConnector(object):
     def __init__(self) -> None:
         self.USER_NAME = "root"
         self.password = "rootpass"
-        self.host = "localhost"
+        self.host = "ap2n-db"
         self.db = "ap2n"
 
     def connect(self) -> MySQLdb.Connection:

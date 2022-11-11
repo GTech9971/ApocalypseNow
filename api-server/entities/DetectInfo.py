@@ -47,13 +47,18 @@ class DetectInfo(object):
                     return []
 
                 for line in lines:
-                    yolo_data = line[0].split(" ")
-                    label = int(yolo_data[0])
+                    yolo_data = line.split(" ")
+                    print(yolo_data)
 
-                    x = int(yolo_data[1])
-                    y = int(yolo_data[2])
-                    w = int(yolo_data[3])
-                    h = int(yolo_data[4])
+                    if len(yolo_data) == 0:
+                        continue
+
+                    label = int(float(yolo_data[0]))
+
+                    x = int(float(yolo_data[1]))
+                    y = int(float(yolo_data[2]))
+                    w = int(float(yolo_data[3]))
+                    h = int(float(yolo_data[4]))
 
                     detect_list.append(DetectInfo(label, x, y, w, h))
 

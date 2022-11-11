@@ -33,7 +33,7 @@ class DetectHitPointService(object):
             if len(contours[i]) > 0:
 
                 # remove small objects
-                if cv2.contourArea(contours[i]) > 500:
+                if cv2.contourArea(contours[i]) > 400:
                     new_contours.append(contours[i])
 
         # 一番外側の輪郭は省く
@@ -95,8 +95,12 @@ class DetectHitPointService(object):
         # 小さい輪郭を削除して文字を消す
         contours = self.removeUnuseContours(contours)
 
+        # img1 = cv2.drawContours(image, contours, -1,
+        #                     (0, 255, 0), 2, cv2.LINE_AA)
+        # cv2.imwrite("./sample400.png", img1)
+
         # ヒットポイントの取得
-        dst: list = []
+        dst: list[TargetSiteHitPoint] = []
         for pt in pt_list:
             for point_n in reversed(range(MIN_POINT, MAX_POINT + 1)):
                 result: bool = self.exists_point_n(point_n, pt)
