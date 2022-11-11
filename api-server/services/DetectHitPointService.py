@@ -77,7 +77,7 @@ class DetectHitPointService(object):
 
         return exists_a and (not exists_b)
 
-    def detectHitInfo(self, image: cv2.Mat, pt_list: list[Point]) -> list[TargetSiteHitPoint]:
+    def detectHitInfo(self, image: cv2.Mat, pt_list: list) -> list:
         """
         ヒット情報を返す
         """
@@ -96,7 +96,7 @@ class DetectHitPointService(object):
         contours = self.removeUnuseContours(contours)
 
         # ヒットポイントの取得
-        dst: list[TargetSiteHitPoint] = []
+        dst: list = []
         for pt in pt_list:
             for point_n in reversed(range(MIN_POINT, MAX_POINT + 1)):
                 result: bool = self.exists_point_n(point_n, pt)

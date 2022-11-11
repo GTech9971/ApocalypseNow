@@ -2,6 +2,7 @@
 .DS_Store
 *.png
 *.jpg
+*.pyc
 
 !/api-server/resources/*.png
 

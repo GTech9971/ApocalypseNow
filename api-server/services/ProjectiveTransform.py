@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from entities.DetectInfo import DetectInfo
-from services.ImageUtils import trim_img
+from services.ImageUtils import ImageUtils
 
 
 class ProjectiveTransform(object):
@@ -54,7 +54,7 @@ class ProjectiveTransform(object):
         img: cv2.Mat = cv2.imread(self.img_path)
 
         # 画像トリミング
-        img = trim_img(self.img_path, self.detect_info)
+        img = ImageUtils.trimImg(self.img_path, self.detect_info)
 
         # グレイスケール
         gray_img: cv2.Mat = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
