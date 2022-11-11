@@ -11,6 +11,9 @@ from fastapi import FastAPI, UploadFile, File
 import cv2
 import detect_targetsite
 import detect_site
+
+import MySQLdb
+
 from services.DetectHitPointService import DetectHitPointService
 from services.ProjectiveTransform import ProjectiveTransform
 from services.ImageUtils import ImageUtils
@@ -49,8 +52,30 @@ def read_root():
 
 @app.get("/test")
 def test_db():
-    service: TargetSiteDbService = TargetSiteDbService()
-    service.publishSiteId()
+    """
+    mysqlに接続し、テーブルを列挙する
+    """
+    # MySQLに接続
+    conn = MySQLdb.connect(
+        user='root',
+        passwd='rootpass',
+        host='ap2n-db',  # docker-composeのサービス名がhost名にあたる
+        db='ap2n')
+
+    # カーソルを取得
+    cur = conn.cursor()
+
+    # SQL文を実行
+    sql = "SHOW TABLES;"
+    cur.execute(sql)
+
+    rows = cur.fetchall()
+
+    # 接続をクローズ
+    cur.close()
+    conn.close()
+
+    return {"tables": str(rows)}
 
 
 @app.post("/upload_target")
