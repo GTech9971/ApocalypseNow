@@ -1,3 +1,9 @@
+"""
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+macの開発環境で起動しない場合は、以下
+python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000 
+"""
+
 from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, File
@@ -13,6 +19,7 @@ from entities.DetectInfo import DetectInfo
 from entities.Point import Point
 from entities.TargetSiteHitPoint import TargetSiteHitPoint
 
+from services.ap2n.TargetSitesDbService import TargetSiteDbService
 
 FILE = Path(__file__).resolve()
 # api-server root directory
@@ -40,9 +47,10 @@ def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/test")
+def test_db():
+    service: TargetSiteDbService = TargetSiteDbService()
+    service.publishSiteId()
 
 
 @app.post("/upload_target")

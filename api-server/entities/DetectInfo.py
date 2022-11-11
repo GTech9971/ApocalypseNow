@@ -20,12 +20,14 @@ class DetectInfo(object):
         "座標を返す x,y,w,h"
         return (selft._x, selft._y, selft._w, selft._h)
 
-    # TODO ロジックの実装
     def convert2CenterPoint(self) -> Point:
         """
         中心座標にして返す
         """
-        pass
+
+        center_x: int = (self._x + self._w) / 2
+        center_y: int = (self._y + self._h) / 2
+        return Point(int(center_x), int(center_y))
 
     def loadLabels(label_path: str) -> list:
         """
