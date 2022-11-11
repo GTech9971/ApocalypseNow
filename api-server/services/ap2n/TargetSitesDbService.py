@@ -1,4 +1,4 @@
-from ap2n.DbConnector import DbConnector
+from services.ap2n.DbConnector import DbConnector
 
 
 class TargetSiteDbService(DbConnector):
