@@ -13,26 +13,28 @@ MAX_POINT: int = 10
 # 最小ポイント
 MIN_POINT: int = 4
 
+# 輪郭の個数
+CONTOURS_COUNT:int = 7
+
 
 class DetectHitPointService(object):
     """
     ターゲットサイトにヒットした点数を取得する
     """
 
-    def __init__(self, site_id: int = -1) -> None:
+    def __init__(self, site_id: int) -> None:
         self.site_id = site_id
 
     def removeUnuseContours(self, contours: list) -> list:
         """
         不要な輪郭を削除する
+        小さい輪郭の削除と、いちばん外側の輪郭の削除、枠線の外側の輪郭の削除を行う
         """
-
-        # 小さな輪郭は削除する
-        new_contours = []
+        
+        new_contours:list = []
         for i in range(0, len(contours)):
-            if len(contours[i]) > 0:
-
-                # remove small objects
+            # 小さな輪郭は削除する
+            if len(contours[i]) > 0:                
                 if cv2.contourArea(contours[i]) > 400:
                     new_contours.append(contours[i])
 
@@ -54,7 +56,7 @@ class DetectHitPointService(object):
         ret = cv2.pointPolygonTest(contour, pt.point(), measureDist=False)
         return ret > 0
 
-    def exists_point_n(self, point_n: int, pt: Point) -> bool:
+    def exists_point_n(self, contours:list, point_n: int, pt: Point) -> bool:
         """
             引数のヒット座標がpoint_n点かどうか調べる
             (例: point_n = 4) ポイント4の内側に存在するかつ、ポイント5の内側には存在しない -> ポイントは4
@@ -63,7 +65,7 @@ class DetectHitPointService(object):
                 pt          : ヒット座標
         """
         exists_a: bool = self.exists_point(
-            self.contours[point_n - MIN_POINT], pt)
+            contours[point_n - MIN_POINT], pt)
 
         # 最大ポイントの内側の場合、それより高い点は存在しないのでtrueを返す
         if point_n == MAX_POINT:
@@ -73,7 +75,7 @@ class DetectHitPointService(object):
                 return False
 
         exists_b: bool = self.exists_point(
-            self.contours[point_n - MIN_POINT + 1], pt)
+            contours[point_n - MIN_POINT + 1], pt)
 
         return exists_a and (not exists_b)
 
@@ -81,7 +83,6 @@ class DetectHitPointService(object):
         """
         ヒット情報を返す
         """
-
         # グレースケール化
         image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -95,6 +96,10 @@ class DetectHitPointService(object):
         # 小さい輪郭を削除して文字を消す
         contours = self.removeUnuseContours(contours)
 
+        # 輪郭が7個でない場合、エラーをはく
+        if not len(contours) == CONTOURS_COUNT:
+            raise Exception(f"輪郭の個数が{len(contours)}個です。{CONTOURS_COUNT}個になるように画像の取り直しが必要です。")
+
         # img1 = cv2.drawContours(image, contours, -1,
         #                     (0, 255, 0), 2, cv2.LINE_AA)
         # cv2.imwrite("./sample400.png", img1)
@@ -103,11 +108,8 @@ class DetectHitPointService(object):
         dst: list[TargetSiteHitPoint] = []
         for pt in pt_list:
             for point_n in reversed(range(MIN_POINT, MAX_POINT + 1)):
-                result: bool = self.exists_point_n(point_n, pt)
-                if result:
-                    model: TargetSiteHitPoint = TargetSiteHitPoint(
-                        self.site_id, pt=pt, hit_point=point_n, created_at="now")
-                    dst.append(model)
-                    continue
+                exists: bool = self.exists_point_n(contours, point_n, pt)
+                if exists:                    
+                    dst.append(TargetSiteHitPoint(self.site_id, pt, point_n))                    
 
         return dst

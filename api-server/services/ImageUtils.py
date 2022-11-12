@@ -22,12 +22,11 @@ class ImageUtils(object):
         finally:
             file.file.close()
 
-    def trimImg(img: cv2.Mat, detect_info: DetectInfo) -> cv2.Mat:
+    def trimImg(img: cv2.Mat, trim_rect: tuple) -> cv2.Mat:
         """
         画像トリミング
         """
-
-        x, y, w, h = detect_info.rect
+        x, y, w, h = trim_rect
         return img[y:h, x:w]
 
     def resizeImg(img: cv2.Mat, width: int, height: int) -> cv2.Mat:

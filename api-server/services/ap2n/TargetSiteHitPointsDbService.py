@@ -27,7 +27,10 @@ class TargetSiteHitPointsDbService(DbConnector):
 
             sql = ""
             for hit_point in hit_point_list:
-                sql += f"INSERT INTO target_site_hit_points VALUES({hit_point.site_id}, {hit_point.pt.x}, {hit_point.pt.y}, {hit_point.hit_point}, NOW());"
+                hit_point:TargetSiteHitPoint = hit_point
+
+                sql += f"""INSERT INTO target_site_hit_points(target_site_id, x, y, hit_point, created_at) 
+                            VALUES({hit_point.site_id}, {hit_point.pt.x}, {hit_point.pt.y}, {hit_point.hit_point}, NOW());"""
 
             cursor.execute(sql)
             con.commit()
@@ -36,4 +39,3 @@ class TargetSiteHitPointsDbService(DbConnector):
             con.close()
         except Exception as e:
             raise e
-        pass

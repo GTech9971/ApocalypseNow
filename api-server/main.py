@@ -12,8 +12,6 @@ import cv2
 import detect_targetsite
 import detect_site
 
-import MySQLdb
-
 from services.DetectHitPointService import DetectHitPointService
 from services.ProjectiveTransform import ProjectiveTransform
 from services.ImageUtils import ImageUtils
@@ -41,6 +39,10 @@ TARGET_SITE_WEIGHT_PATH = Path(ROOT, "weights", "targetsite.pt")
 # 的の学習結果データ
 SITE_WEIGHT_PATH = Path(ROOT, "weights", "site.pt")
 
+#リサイズサイズ
+RESIZE_WIDTH:int = 640
+RESIZE_HEIGHT:int = 640
+
 # yolo v5 app root directory
 YOLO_APP_ROOT = Path("/usr/src/app")
 
@@ -52,70 +54,23 @@ def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/test")
-def test_db():
-    """
-    mysqlに接続し、target_sites テーブルの中身を列挙する
-    """
-    # MySQLに接続
-    conn = MySQLdb.connect(
-        user='root',
-        passwd='rootpass',
-        host='ap2n-db',  # docker-composeのサービス名がhost名にあたる
-        db='ap2n')
-
-    # カーソルを取得
-    cur = conn.cursor()
-
-    # SQL文を実行
-    sql = "SELECT * FROM target_sites;"
-    cur.execute(sql)
-
-    rows = cur.fetchall()
-
-    # 接続をクローズ
-    cur.close()
-    conn.close()
-
-    return {"tables": str(rows)}
-
-
-@app.get("/test_published")
-def test_publishe():
-    service: TargetSitesDbService = TargetSitesDbService()
-    return service.publishSiteId()
-
-
-@app.get("/test_insert_targetsite")
-def test_insert_targetsite():
-    service: TargetSitesDbService = TargetSitesDbService()
-    site_id: int = service.publishSiteId()
-    save_path: str = Path(ROOT, "upload", "sample.png")
-    targetSite: TargetSite = TargetSite(site_id, str(save_path))
-    return service.insert(targetSite)
-
-
-@app.post("/upload_target")
-def upload_target(file: UploadFile = File(...), site_id: int = None):
+@app.post("/upload_original_target_site")
+def upload_original_target_site(file: UploadFile = File(...)):
     """
         サイトの画像を受信し、yoloを使用してサイトのみの画像に切り取る。
-        座標と、切り取った画像(デフォルトでは返さない)をbase64で返す
+        サイトのIDを返す
 
         @input
             file    : サイトの画像ファイル
-            site_id : サイトの識別id
 
         @return
             message : メッセージ
-            rect    : x,y,w,h
-            cut_img : 切り取ったサイト
-    """
-    is_new: bool = site_id is None
+            site_id : サイトのid
+    """    
     targetSiteDbservice: TargetSitesDbService = TargetSitesDbService()
 
-    # site_idがNoneの場合、id発行
-    if site_id is None:
-        site_id = targetSiteDbservice.publishSiteId()
+    #id発行
+    site_id:int = targetSiteDbservice.publishSiteId()
 
     # 画像ファイルの保存
     save_path = Path(UPLOAD_TARGETSITE_PATH, file.filename)
@@ -134,12 +89,11 @@ def upload_target(file: UploadFile = File(...), site_id: int = None):
         return {"message": "的が識別できませんでした。別の画像をアップロードしてください"}
 
     detect_info: list[DetectInfo] = DetectInfo.loadLabels(label_path)
-    detect_info = detect_info[0]
+    detect_info:DetectInfo = detect_info[0]
 
-    # 的のみの画像にトリミングして、固定サイズにリサイズ
+    # 的のみの画像にトリミング
     image: cv2.Mat = cv2.imread(save_path)
-    image = ImageUtils.trimImg(image, detect_info)
-    image = ImageUtils.resizeImg(image, width=640, height=640)
+    image = ImageUtils.trimImg(image, detect_info.rect)    
 
     # 射影変換を行う 失敗した場合無視する
     # TODO 中身の修正 imageが帰るようにする
@@ -151,11 +105,55 @@ def upload_target(file: UploadFile = File(...), site_id: int = None):
     # finally:
     #     pass
 
+    # 固定サイズにリサイズ
+    image = ImageUtils.resizeImg(image, width=RESIZE_WIDTH, height=RESIZE_HEIGHT)
+
     # 画像の際保存 & dbへパスの保存
     cv2.imwrite(save_path, image)
-    targetSite: TargetSite = TargetSite(site_id, str(save_path))
-    targetSiteDbservice.record(targetSite, is_new)
+    targetSite: TargetSite = TargetSite(site_id, str(save_path), detect_info.rect)
+    targetSiteDbservice.record(targetSite)
 
+    return {"message": "サイトの新規登録完了", "site_id": site_id}
+
+
+@app.post("/shoot_target_site")
+def shoot_target_site(file: UploadFile, site_id: int):
+    """
+        射撃後のサイトの画像を受信し、射撃座標の取得と点数をテーブルに記録し、返す
+    """
+
+    targetSiteDbservice: TargetSitesDbService = TargetSitesDbService()
+
+    #サイトidが存在するか確認する
+    targetSite:TargetSite = targetSiteDbservice.fetchTargetSite(site_id=site_id)
+    if targetSite is None:
+        return {"message":f"サイトid:{site_id}が存在しません"}
+
+     # 画像ファイルの保存
+    save_path = Path(UPLOAD_SITE_PATH, file.filename)
+    try:
+        ImageUtils.saveImg(file=file, save_path=save_path)
+    except Exception as e:
+        return {"message": e}
+    
+    
+    #トリミング
+    image:cv2.Mat = cv2.imread(save_path)
+    image = ImageUtils.trimImg(image, targetSite.getTrimRect())
+    # 射影変換を行う 失敗した場合無視する
+    # TODO 中身の修正 imageが帰るようにする
+    # projective_transform = ProjectiveTransform(save_path, detect_info)
+    # try:
+    #     projective_transform.exec()
+    # except Exception as e:
+    #     print("射影変換失敗")
+    # finally:
+    #     pass
+
+    #固定サイズにリサイズ
+    image = ImageUtils.resizeImg(image, width=RESIZE_WIDTH, height=RESIZE_HEIGHT)
+    
+    # ヒットポイントの解析
     label_path = Path(ROOT, "runs/detect/exp_site/labels/",
                       file.filename.replace(".png", ".txt"))
 
@@ -170,22 +168,32 @@ def upload_target(file: UploadFile = File(...), site_id: int = None):
     if not label_path.exists():
         return {"message": "ヒットポイントが見つかりませんでした。"}
 
-    detect_list: list = DetectInfo.loadLabels(label_path)
+    detect_list: list[DetectInfo] = DetectInfo.loadLabels(label_path)
 
     # yoloで取得したx,y,w,h座標から中心地の座標(x,y)に変換する
-    pt_list: list = []
+    pt_list: list[Point] = []
     for detect in detect_list:
         pt_list.append(detect.convert2CenterPoint())
 
     # ヒットポイントの取得を行う
     detectHitPointService: DetectHitPointService = DetectHitPointService(
         site_id=site_id)
-    # TODO ヒットポイントありの画像の場合、輪郭が思ったように取得できない。ヒットする前の綺麗な状態の的の画像を残しておいて使用するか？
-    hit_point_list: list[TargetSiteHitPoint] = detectHitPointService.detectHitInfo(
-        image=image, pt_list=pt_list)
 
-    # TODO ヒットポイント座標と、ヒットポイントをdbに記録
+    # 新規サイトアップロード時の画像を読み込んでヒットポイント解析に使用する
+    original_image:cv2.Mat = cv2.imread(targetSite.img_path)
+
+    try:
+        hit_point_list: list[TargetSiteHitPoint] = detectHitPointService.detectHitInfo(
+        image=original_image, pt_list=pt_list)
+    except Exception as e:
+        return {"message":e}
+    
+    # ヒットポイント座標、ヒットポイントをtarget_site_hit_pointsテーブルに記録
     targetSiteHitPointsDbService: TargetSiteHitPointsDbService = TargetSiteHitPointsDbService()
     targetSiteHitPointsDbService.record(hit_point_list)
 
-    return {"message": "", "site_id": site_id, "list": hit_point_list}
+    #ヒット後のサイト画像パスをtarget_siteテーブルに記録
+    targetSiteDbservice.recordHitImagePath(site_id=site_id, hit_img_path=save_path)
+
+
+    return {"message": "ヒットポイントを解析しました。", "site_id": site_id, "list": hit_point_list}
