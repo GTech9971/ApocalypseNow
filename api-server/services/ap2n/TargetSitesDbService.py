@@ -107,7 +107,7 @@ class TargetSitesDbService(DbConnector):
 
             
             sql = f"""INSERT INTO target_sites(id, img_path, trim_x, trim_y, trim_w, trim_h, created_at) 
-                        VALUES({target_site.id}, '{target_site.img_path}', {target_site.trim_x}, {target_site.trim_y}, {target_site.trim_w}, {target_site.trim_h}, NOW());"""
+                        VALUES({target_site.site_id}, '{target_site.img_path}', {target_site.trim_x}, {target_site.trim_y}, {target_site.trim_w}, {target_site.trim_h}, NOW());"""
             
             cursor.execute(sql)
             con.commit()

@@ -6,7 +6,7 @@ python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile
 
 import cv2
 import detect_targetsite
@@ -62,7 +62,7 @@ def read_root():
 @app.get("/fetch_all_target_site")
 def fetch_all_target_site():
     """
-    dbに保存されているすべてのsite_idを返す
+    dbに保存されているすべてのサイトを返す
     """
     targetSiteDbservice: TargetSitesDbService = TargetSitesDbService()
     site_list:list[TargetSite] = targetSiteDbservice.fetchAllTargetSite()
@@ -73,13 +73,13 @@ def fetch_all_target_site():
 def upload_original_target_site(file: UploadFile):
     """
         サイトの画像を受信し、yoloを使用してサイトのみの画像に切り取る。
-        サイトのIDを返す
+        サイトの情報を返す
 
         @input
             file    : サイトの画像            
         @return
-            message : メッセージ
-            site_id : サイトのid
+            message     : メッセージ
+            target_site : サイトの情報
     """    
     targetSiteDbservice: TargetSitesDbService = TargetSitesDbService()
 
@@ -127,7 +127,7 @@ def upload_original_target_site(file: UploadFile):
     targetSite: TargetSite = TargetSite(site_id, str(save_path), detect_info.rect)
     targetSiteDbservice.record(targetSite)
 
-    return UploadOriginalTargetSiteResponse(return_code=0, message="", site_id=site_id, trim_rect=detect_info.rect)
+    return UploadOriginalTargetSiteResponse(return_code=0, message="", target_site=TargetSite(site_id=site_id, img_path=save_path, trim_rect=detect_info.rect))
 
 
 @app.post("/shoot_target_site")
