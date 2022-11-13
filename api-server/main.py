@@ -6,7 +6,7 @@ python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 from pathlib import Path
 
-from fastapi import FastAPI #, UploadFile, File
+from fastapi import FastAPI, UploadFile, File
 
 import cv2
 import detect_targetsite
@@ -69,15 +69,13 @@ def fetch_all_target_site():
     return site_id_list
 
 @app.post("/upload_original_target_site")
-def upload_original_target_site(base64: str, file_name:str):
+def upload_original_target_site(file: UploadFile):
     """
         サイトの画像を受信し、yoloを使用してサイトのみの画像に切り取る。
         サイトのIDを返す
 
         @input
-            base64    : サイトの画像データbase64形式
-            file_name : 画像のファイル名
-
+            file    : サイトの画像            
         @return
             message : メッセージ
             site_id : サイトのid
@@ -88,16 +86,18 @@ def upload_original_target_site(base64: str, file_name:str):
     site_id:int = targetSiteDbservice.publishSiteId()
 
     # 画像ファイルの保存
-    save_path = Path(UPLOAD_TARGETSITE_PATH, file_name)
-    image:cv2.Mat = ImageUtils.base64ToImg(base64)
-    cv2.imwrite(save_path, image)
+    save_path = Path(UPLOAD_TARGETSITE_PATH, file.filename)
+    try:
+        ImageUtils.saveImg(file, save_path)
+    except Exception as e:
+        return BaseResponse(return_code=1, message=e)
 
     # yoloで的の座標取得
     detect_targetsite.run(weights=TARGET_SITE_WEIGHT_PATH,
                           source=save_path, save_txt=True, exist_ok=True)
     # 出力結果を読み取る
     label_path = Path(ROOT, "runs/detect/exp/labels/",
-                      file_name.replace(".png", ".txt"))
+                      file.filename.replace(".png", ".txt"))
     if not label_path.exists():
         return BaseResponse(return_code=1, message="的が識別できませんでした。別の画像をアップロードしてください")        
 
@@ -105,6 +105,7 @@ def upload_original_target_site(base64: str, file_name:str):
     detect_info:DetectInfo = detect_info[0]
 
     # 的のみの画像にトリミング
+    image:cv2.Mat = cv2.imread(save_path)
     image = ImageUtils.trimImg(image, detect_info.rect)    
 
     # 射影変換を行う 失敗した場合無視する
@@ -129,7 +130,7 @@ def upload_original_target_site(base64: str, file_name:str):
 
 
 @app.post("/shoot_target_site")
-def shoot_target_site(base64Str: str, file_name:str, site_id: int):
+def shoot_target_site(file: UploadFile, site_id: int):
     """
         射撃後のサイトの画像を受信し、射撃座標の取得と点数をテーブルに記録し、返す
     """
@@ -141,13 +142,16 @@ def shoot_target_site(base64Str: str, file_name:str, site_id: int):
     if targetSite is None:
         return {"message":f"サイトid:{site_id}が存在しません"}
 
-     # 画像ファイルの保存
-    image:cv2.Mat = ImageUtils.base64ToImg(base64Str)
-    save_path = Path(UPLOAD_SITE_PATH, file_name)
-    cv2.imwrite(save_path, image)
+    # 画像ファイルの保存
+    save_path = Path(UPLOAD_SITE_PATH, file.filename)
+    try:
+        ImageUtils.saveImg(file, save_path)
+    except Exception as e:
+        return BaseResponse(return_code=1, message=e)
 
     
     #トリミング
+    image:cv2.Mat = cv2.imread(save_path)
     image = ImageUtils.trimImg(image, targetSite.getTrimRect())
     # 射影変換を行う 失敗した場合無視する
     # TODO 中身の修正 imageが帰るようにする
@@ -164,7 +168,7 @@ def shoot_target_site(base64Str: str, file_name:str, site_id: int):
     
     # ヒットポイントの解析
     label_path = Path(ROOT, "runs/detect/exp_site/labels/",
-                      file_name.replace(".png", ".txt"))
+                      file.filename.replace(".png", ".txt"))
 
     # ファイルが重複するので、古いファイルを削除する
     if label_path.exists():
