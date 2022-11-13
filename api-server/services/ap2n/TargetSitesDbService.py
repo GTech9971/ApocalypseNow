@@ -15,6 +15,30 @@ class TargetSitesDbService(DbConnector):
     def __init__(self) -> None:
         super().__init__()
 
+    def fetchAllSiteId(self)->list:
+        """
+        すべてのsite_idを返す
+        """
+        con = self.connect()
+        cursor: MySQLdb.cursors.Cursor = con.cursor()
+
+        sql = "SELECT id FROM target_sites;"
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+
+        cursor.close()
+        con.close()
+
+        site_id_list:list = []
+        for row in rows:
+            if row[0] is None:
+                return []
+            site_id_list.append(int(row[0]))
+        
+        return site_id_list
+            
+
+
     def publishSiteId(self) -> int:
         """
         ターゲットサイトの新しいidを採番する

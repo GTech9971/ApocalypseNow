@@ -58,6 +58,16 @@ def read_root():
     return BaseResponse(return_code=0, message="hello world")
 
 
+@app.get("/fetch_all_target_site")
+def fetch_all_target_site():
+    """
+    dbに保存されているすべてのsite_idを返す
+    """
+    targetSiteDbservice: TargetSitesDbService = TargetSitesDbService()
+    site_id_list:list[int] = targetSiteDbservice.fetchAllSiteId()
+
+    return site_id_list
+
 @app.post("/upload_original_target_site")
 def upload_original_target_site(base64: str, file_name:str):
     """
