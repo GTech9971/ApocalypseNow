@@ -3,7 +3,7 @@ class TargetSite(object):
     的の情報を格納する
     """
 
-    def __init__(self, id: int, img_path: str, trim_rect:tuple) -> None:
+    def __init__(self, site_id: int, img_path: str, trim_rect:tuple) -> None:
         """
             @param
                 id          :   サイトのid
@@ -11,7 +11,7 @@ class TargetSite(object):
                 trim_rect   :   トリミング時の座標(x,y,w,h)                
         """
 
-        self.id = id
+        self.site_id = site_id
         self.img_path = img_path        
         self.trim_x = trim_rect[0]
         self.trim_y = trim_rect[1]

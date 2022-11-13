@@ -17,6 +17,7 @@ from services.ProjectiveTransform import ProjectiveTransform
 from services.ImageUtils import ImageUtils
 
 from entities.BaseResponse import BaseResponse
+from entities.FetchAllTargetSiteResponse import FetchAllTargetSieResponse
 from entities.UploadOriginalTargetSiteResponse import UploadOriginalTargetSiteResponse
 from entities.ShootTargetSiteResponse import ShootTargetSiteResponse
 
@@ -64,9 +65,9 @@ def fetch_all_target_site():
     dbに保存されているすべてのsite_idを返す
     """
     targetSiteDbservice: TargetSitesDbService = TargetSitesDbService()
-    site_id_list:list[int] = targetSiteDbservice.fetchAllSiteId()
+    site_list:list[TargetSite] = targetSiteDbservice.fetchAllTargetSite()
 
-    return site_id_list
+    return FetchAllTargetSieResponse(return_code=0, message="", target_site_list=site_list)
 
 @app.post("/upload_original_target_site")
 def upload_original_target_site(file: UploadFile):

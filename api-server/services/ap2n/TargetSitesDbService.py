@@ -15,27 +15,34 @@ class TargetSitesDbService(DbConnector):
     def __init__(self) -> None:
         super().__init__()
 
-    def fetchAllSiteId(self)->list:
+    def fetchAllTargetSite(self)->list:
         """
-        すべてのsite_idを返す
+        すべてのtarget_siteを返す
         """
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = "SELECT id FROM target_sites;"
+        sql = "SELECT id, img_path, hit_img_path, created_at, updated_at, trim_x, trim_y, trim_w, trim_h  FROM target_sites;"
         cursor.execute(sql)
         rows = cursor.fetchall()
 
         cursor.close()
         con.close()
 
-        site_id_list:list = []
+        site_list:list[TargetSite] = []
         for row in rows:
             if row[0] is None:
                 return []
-            site_id_list.append(int(row[0]))
+            
+            site_id, img_path, hit_img_path, created_at, updated_at, trim_x, trim_y, trim_w, trim_h = row
+            target_site:TargetSite = TargetSite(site_id=int(site_id), img_path=img_path, trim_rect=(int(trim_x), int(trim_y), int(trim_w), int(trim_h)))
+            target_site.created_at = created_at
+            target_site.hit_img_path = hit_img_path
+            target_site.updated_at = updated_at
+            
+            site_list.append(target_site)
         
-        return site_id_list
+        return site_list
             
 
 
