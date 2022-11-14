@@ -114,7 +114,9 @@ def upload_original_target_site(file: UploadFile):
     
     # 未検出の場合、画像を別フォルダに保存し、dbに記録する
     if not label_path.exists():
+        image:cv2.Mat = cv2.imread(save_path)
         save_path = Path(UNDETECT_TARGET_SITE_PATH, file.filename)
+        cv2.imwrite(save_path, image)
         undetectTargetSite:UnDetectTargetSite = UnDetectTargetSite(img_path=save_path)
         unDetectTargetSitesDbService:UnDetectTargetSitesDbService = UnDetectTargetSitesDbService()
         unDetectTargetSitesDbService.record(undetectTargetSite)
