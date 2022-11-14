@@ -59,6 +59,13 @@ def read_root():
     return BaseResponse(return_code=0, message="hello world")
 
 
+@app.post("/auth")
+def auth():
+    """
+    認証を行う TODO
+    """
+    return BaseResponse(return_code=0, message="hello world")
+
 @app.get("/fetch_all_target_site")
 def fetch_all_target_site():
     """
