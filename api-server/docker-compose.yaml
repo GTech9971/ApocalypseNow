@@ -26,6 +26,9 @@ services:
     container_name: ap2n-server
     networks:
       - ap2nnet
+    volumes:
+      - ./upload:/usr/src/app/ApocalypseNow/api-server/upload # アップロード画像
+      - ./undetect:/usr/src/app/ApocalypseNow/api-server/undetect # 未検出画像 yolo精度向上のためバインドする
     working_dir: /usr/src/app/ApocalypseNow/api-server/
     tty: true #バックグラウンドで起動     
     shm_size: '2gb' #メモリ不足で落ちる対策

@@ -24,3 +24,10 @@ CREATE TABLE target_site_hit_points(
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+/** 未検出画像保存用のテーブル */
+DROP TABLE IF EXISTS undetect_target_sites;
+CREATE TABLE undetect_target_sites(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    img_path VARCHAR(256) NOT NULL    
+);

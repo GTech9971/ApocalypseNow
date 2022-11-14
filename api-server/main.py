@@ -25,9 +25,11 @@ from entities.DetectInfo import DetectInfo
 from entities.Point import Point
 from entities.TargetSite import TargetSite
 from entities.TargetSiteHitPoint import TargetSiteHitPoint
+from entities.UnDetectTargetSite import UnDetectTargetSite
 
 from services.ap2n.TargetSitesDbService import TargetSitesDbService
 from services.ap2n.TargetSiteHitPointsDbService import TargetSiteHitPointsDbService
+from services.ap2n.UnDetectTargetSitesDbService import UnDetectTargetSitesDbService
 
 FILE = Path(__file__).resolve()
 # api-server root directory
@@ -38,6 +40,9 @@ ROOT = FILE.parents[0]
 UPLOAD_TARGETSITE_PATH = Path(ROOT, "upload", "targetsite")
 # アップロードされた的の画像データ
 UPLOAD_SITE_PATH = Path(ROOT, "upload", "site")
+
+# yoloで検出できなかった的画像のデータ
+UNDETECT_TARGET_SITE_PATH = Path(ROOT, "undetect", "targetsite")
 
 # 的本体の学習結果データ
 TARGET_SITE_WEIGHT_PATH = Path(ROOT, "weights", "targetsite.pt")
@@ -106,7 +111,13 @@ def upload_original_target_site(file: UploadFile):
     # 出力結果を読み取る
     label_path = Path(ROOT, "runs/detect/exp/labels/",
                       file.filename.replace(".png", ".txt"))
+    
+    # 未検出の場合、画像を別フォルダに保存し、dbに記録する
     if not label_path.exists():
+        save_path = Path(UNDETECT_TARGET_SITE_PATH, file.filename)
+        undetectTargetSite:UnDetectTargetSite = UnDetectTargetSite(img_path=save_path)
+        unDetectTargetSitesDbService:UnDetectTargetSitesDbService = UnDetectTargetSitesDbService()
+        unDetectTargetSitesDbService.record(undetectTargetSite)
         return BaseResponse(return_code=1, message="的が識別できませんでした。別の画像をアップロードしてください")        
 
     detect_info: list[DetectInfo] = DetectInfo.loadLabels(label_path)
