@@ -42,7 +42,7 @@ UPLOAD_TARGETSITE_PATH = Path(ROOT, "upload", "targetsite")
 UPLOAD_SITE_PATH = Path(ROOT, "upload", "site")
 
 # yoloで検出できなかった的画像のデータ
-UNDETECT_TARGET_SITE_PATH = Path(ROOT, "undetect", "targetsite")
+UNDETECT_TARGET_SITE_PATH = Path(ROOT, "undetect")
 
 # 的本体の学習結果データ
 TARGET_SITE_WEIGHT_PATH = Path(ROOT, "weights", "targetsite.pt")
