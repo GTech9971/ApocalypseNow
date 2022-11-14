@@ -29,5 +29,6 @@ CREATE TABLE target_site_hit_points(
 DROP TABLE IF EXISTS undetect_target_sites;
 CREATE TABLE undetect_target_sites(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    img_path VARCHAR(256) NOT NULL    
+    img_path VARCHAR(256) NOT NULL,
+    created_at DATETIME
 );
