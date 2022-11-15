@@ -6,7 +6,6 @@ import numpy as np
 from pathlib import Path
 
 from fastapi import UploadFile
-from entities.DetectInfo import DetectInfo
 
 
 class ImageUtils(object):

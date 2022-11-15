@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from entities.Point import Point
 
 
@@ -29,7 +31,7 @@ class DetectInfo(object):
         center_y: int = (self._y + self._h) / 2
         return Point(int(center_x), int(center_y))
 
-    def loadLabels(label_path: str) -> list:
+    def loadLabels(label_path: str) -> list[DetectInfo]:
         """
         ラベルを読み込む
         @input

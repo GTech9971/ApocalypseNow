@@ -1,3 +1,4 @@
+from __future__ import annotations
 import MySQLdb
 
 from services.ap2n.DbConnector import DbConnector
@@ -13,7 +14,7 @@ class TargetSiteHitPointsDbService(DbConnector):
     def __init__(self) -> None:
         super().__init__()
 
-    def record(self, hit_point_list: list):
+    def record(self, hit_point_list: list[TargetSiteHitPoint]):
         """
         ターゲットサイトヒットポイントをdbに追加する
         """
@@ -27,7 +28,6 @@ class TargetSiteHitPointsDbService(DbConnector):
 
             sql = "INSERT INTO target_site_hit_points(target_site_id, x, y, hit_point, created_at) VALUES\n"
             for hit_point in hit_point_list:
-                hit_point:TargetSiteHitPoint = hit_point
                 sql += f"   ({hit_point.site_id}, {hit_point.pt.x}, {hit_point.pt.y}, {hit_point.hit_point}, NOW()),\n"
 
             sql = sql[0:len(sql) - 2] + ";"

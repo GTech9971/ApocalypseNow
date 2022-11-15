@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import MySQLdb
 import MySQLdb.cursors
 
 from services.ap2n.DbConnector import DbConnector
 
 from entities.TargetSite import TargetSite
-from entities.DetectInfo import DetectInfo
+
 
 
 class TargetSitesDbService(DbConnector):
@@ -15,7 +17,7 @@ class TargetSitesDbService(DbConnector):
     def __init__(self) -> None:
         super().__init__()
 
-    def fetchAllTargetSite(self)->list:
+    def fetchAllTargetSite(self)->list[TargetSite]:
         """
         すべてのtarget_siteを返す
         """

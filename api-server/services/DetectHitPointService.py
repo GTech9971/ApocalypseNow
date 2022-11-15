@@ -82,7 +82,7 @@ class DetectHitPointService(object):
 
         return exists_a and (not exists_b)
 
-    def detectHitInfo(self, image: cv2.Mat, pt_list: list[Point]) -> Tuple[list, cv2.Mat]:
+    def detectHitInfo(self, image: cv2.Mat, pt_list: list[Point]) -> Tuple[list[TargetSiteHitPoint], cv2.Mat]:
         """
         ヒット情報を返す
         @input
