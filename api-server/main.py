@@ -43,6 +43,8 @@ UPLOAD_SITE_PATH = Path(ROOT, "upload", "site")
 
 # 輪郭を塗った的の画像データ
 DRAW_CONTOURS_PATH = Path(ROOT, "upload", "draw")
+# ヒットポイントを塗った画像データ
+DRAW_HIT_POINT_PATH = Path(ROOT, "upload", "hitpoint")
 
 # yoloで検出できなかった的画像のデータ
 UNDETECT_TARGET_SITE_PATH = Path(ROOT, "undetect")
@@ -225,8 +227,13 @@ def shoot_target_site(file: UploadFile, site_id: int):
         hit_point_list, img1 = detectHitPointService.detectHitInfo(
         image=original_image, pt_list=pt_list)
         #輪郭を塗った画像の保存
-        draw_save_path = Path(DRAW_CONTOURS_PATH, file.filename)
+        draw_save_path :Path= Path(DRAW_CONTOURS_PATH, file.filename)
         cv2.imwrite(draw_save_path, img1)
+
+        # 射撃位置を塗った画像の保存
+        hit_point_path:Path = Path(DRAW_HIT_POINT_PATH, file.filename)
+        image = detectHitPointService.drawHitPoint(image, hit_point_list)
+        cv2.imwrite(hit_point_path, image)
     except Exception as e:
         return BaseResponse(return_code=1, message=str(e))       
 

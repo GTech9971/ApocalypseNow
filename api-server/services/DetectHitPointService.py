@@ -111,8 +111,7 @@ class DetectHitPointService(object):
             raise Exception(f"輪郭の個数が{len(contours)}個です。{CONTOURS_COUNT}個になるように画像の取り直しが必要です。")
 
         img1 = cv2.drawContours(image, contours, -1,
-                             (0, 255, 0), 2, cv2.LINE_AA)
-        # cv2.imwrite("./sample400.png", img1)
+                             (0, 255, 0), 2, cv2.LINE_AA)        
 
         # ヒットポイントの取得
         dst: list[TargetSiteHitPoint] = []
@@ -121,5 +120,21 @@ class DetectHitPointService(object):
                 exists: bool = self.exists_point_n(contours, point_n, pt)
                 if exists:                    
                     dst.append(TargetSiteHitPoint(self.site_id, pt, point_n))                    
-
+        
         return dst, img1
+
+    def drawHitPoint(self, image: cv2.Mat, ht_list: list[TargetSiteHitPoint]) -> cv2.Mat:
+        """
+            点数と座標の記載
+        """        
+        for ht in ht_list:
+            cv2.putText(image,
+                text=f"(x={ht.pt.x}, y={ht.pt.y} hit point={ht.hit_point})",
+                org=(ht.pt.x, ht.pt.y + 10),
+                fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                fontScale=0.3,
+                color=(0, 255, 0),
+                thickness=1,
+                lineType=cv2.LINE_2)
+
+        return image
