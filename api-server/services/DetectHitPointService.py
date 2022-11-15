@@ -115,7 +115,7 @@ class DetectHitPointService(object):
 
         # ヒットポイントの取得
         dst: list[TargetSiteHitPoint] = []
-        for pt in pt_list:
+        for pt in pt_list:       
             for point_n in reversed(range(MIN_POINT, MAX_POINT + 1)):
                 exists: bool = self.exists_point_n(contours, point_n, pt)
                 if exists:                    
@@ -128,10 +128,10 @@ class DetectHitPointService(object):
             点数と座標の記載
         """        
         for ht in ht_list:
-            cv2.circle(image, center=ht.pt.point(), radius=5, color=(0, 0, 255), thickness=-1, lineType=cv2.LINE_4, shift=0)
+            cv2.circle(image, center=ht.pt.point(), radius=3, color=(0, 0, 255), thickness=-1, lineType=cv2.LINE_4, shift=0)
             cv2.putText(image,
                 text=f"(x={ht.pt.x}, y={ht.pt.y} hit point={ht.hit_point})",
-                org=(ht.pt.x + 10, ht.pt.y + 10),
+                org=(ht.pt.x + 10, ht.pt.y),
                 fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=0.5,
                 color=(0, 255, 0),
