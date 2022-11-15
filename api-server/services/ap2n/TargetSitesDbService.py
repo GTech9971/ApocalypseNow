@@ -85,8 +85,7 @@ class TargetSitesDbService(DbConnector):
             if row[0] is None:
                 return None
             
-            print(row[0])
-            id, img_path, hit_img_path, created_at, updated_at, trim_x, trim_y, trim_w, trim_h = row[0]
+            id, img_path, hit_img_path, created_at, updated_at, trim_x, trim_y, trim_w, trim_h = row
 
             result: TargetSite = TargetSite(id=id, img_path=img_path, trim_rect=(int(trim_x), int(trim_y), int(trim_w), int(trim_h)))
             result.created_at = created_at
