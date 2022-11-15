@@ -25,13 +25,13 @@ class TargetSiteHitPointsDbService(DbConnector):
             sql = f"DELETE FROM target_site_hit_points WHERE target_site_id = {hit_point_list[0].site_id}"
             cursor.execute(sql)
 
-            sql = ""
+            sql = "INSERT INTO target_site_hit_points(target_site_id, x, y, hit_point, created_at) VALUES\n"
             for hit_point in hit_point_list:
                 hit_point:TargetSiteHitPoint = hit_point
+                sql += f"   ({hit_point.site_id}, {hit_point.pt.x}, {hit_point.pt.y}, {hit_point.hit_point}, NOW()),\n"
 
-                sql += f"""INSERT INTO target_site_hit_points(target_site_id, x, y, hit_point, created_at) 
-                            VALUES({hit_point.site_id}, {hit_point.pt.x}, {hit_point.pt.y}, {hit_point.hit_point}, NOW());"""
-
+            sql = sql[0:len(sql) - 2] + ";"
+            
             cursor.execute(sql)
             con.commit()
 

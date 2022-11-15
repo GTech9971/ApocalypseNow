@@ -129,7 +129,7 @@ class TargetSitesDbService(DbConnector):
             con = self.connect()
             cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-            sql = f"""UPDATE target_sites SET hit_img_path = {hit_img_path}, updated_at = NOW() WHERE id = {site_id};"""                        
+            sql = f"""UPDATE target_sites SET hit_img_path = '{hit_img_path}', updated_at = NOW() WHERE id = {site_id};"""                        
             
             cursor.execute(sql)
             con.commit()

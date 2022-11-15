@@ -3,9 +3,12 @@ find_contoursにおける輪郭の取得
 https://www.learning-nao.com/?p=2020
 """
 
+from __future__ import annotations
+
 from entities.Point import Point
 from entities.TargetSiteHitPoint import TargetSiteHitPoint
 
+from typing import Tuple
 import cv2
 
 # 最大ポイント
@@ -79,9 +82,16 @@ class DetectHitPointService(object):
 
         return exists_a and (not exists_b)
 
-    def detectHitInfo(self, image: cv2.Mat, pt_list: list) -> list:
+    def detectHitInfo(self, image: cv2.Mat, pt_list: list[Point]) -> Tuple[list, cv2.Mat]:
         """
         ヒット情報を返す
+        @input
+            image   :   トリミングされた射撃後の画像
+            pt_list :   射撃座標リスト
+
+        @output
+            list    :   ヒットポイント情報リスト
+            cv2.Mat :   輪郭が塗られた画像
         """
         # グレースケール化
         image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -100,8 +110,8 @@ class DetectHitPointService(object):
         if not len(contours) == CONTOURS_COUNT:
             raise Exception(f"輪郭の個数が{len(contours)}個です。{CONTOURS_COUNT}個になるように画像の取り直しが必要です。")
 
-        # img1 = cv2.drawContours(image, contours, -1,
-        #                     (0, 255, 0), 2, cv2.LINE_AA)
+        img1 = cv2.drawContours(image, contours, -1,
+                             (0, 255, 0), 2, cv2.LINE_AA)
         # cv2.imwrite("./sample400.png", img1)
 
         # ヒットポイントの取得
@@ -112,4 +122,4 @@ class DetectHitPointService(object):
                 if exists:                    
                     dst.append(TargetSiteHitPoint(self.site_id, pt, point_n))                    
 
-        return dst
+        return dst, img1

@@ -41,6 +41,9 @@ UPLOAD_TARGETSITE_PATH = Path(ROOT, "upload", "targetsite")
 # アップロードされた的の画像データ
 UPLOAD_SITE_PATH = Path(ROOT, "upload", "site")
 
+# 輪郭を塗った的の画像データ
+DRAW_CONTOURS_PATH = Path(ROOT, "upload", "draw")
+
 # yoloで検出できなかった的画像のデータ
 UNDETECT_TARGET_SITE_PATH = Path(ROOT, "undetect")
 
@@ -186,6 +189,7 @@ def shoot_target_site(file: UploadFile, site_id: int):
 
     #固定サイズにリサイズ
     image = ImageUtils.resizeImg(image, width=RESIZE_WIDTH, height=RESIZE_HEIGHT)
+    cv2.imwrite(save_path, image)
     
     # ヒットポイントの解析
     label_path = Path(ROOT, "runs/detect/exp_site/labels/",
@@ -218,8 +222,11 @@ def shoot_target_site(file: UploadFile, site_id: int):
 
     hit_point_list: list[TargetSiteHitPoint] = []
     try:
-        hit_point_list = detectHitPointService.detectHitInfo(
+        hit_point_list, img1 = detectHitPointService.detectHitInfo(
         image=original_image, pt_list=pt_list)
+        #輪郭を塗った画像の保存
+        draw_save_path = Path(DRAW_CONTOURS_PATH, file.filename)
+        cv2.imwrite(draw_save_path, img1)
     except Exception as e:
         return BaseResponse(return_code=1, message=str(e))       
 
