@@ -74,7 +74,7 @@ class TargetSitesDbService(DbConnector):
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = f"SELECT id, img_path, hit_img, created_at, updated_at, trim_x, trim_y, trim_w, trim_h FROM target_sites WHERE id = {site_id};"
+        sql = f"SELECT id, img_path, hit_img_path, created_at, updated_at, trim_x, trim_y, trim_w, trim_h FROM target_sites WHERE id = {site_id};"
         cursor.execute(sql)
         rows = cursor.fetchall()
 
