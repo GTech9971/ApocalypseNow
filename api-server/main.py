@@ -103,7 +103,7 @@ def upload_original_target_site(file: UploadFile):
     try:
         ImageUtils.saveImg(file, save_path)
     except Exception as e:
-        return BaseResponse(return_code=1, message=e)
+        return BaseResponse(return_code=1, message=str(e))
 
     # yoloで的の座標取得
     detect_targetsite.run(weights=TARGET_SITE_WEIGHT_PATH,
@@ -168,7 +168,7 @@ def shoot_target_site(file: UploadFile, site_id: int):
     try:
         ImageUtils.saveImg(file, save_path)
     except Exception as e:
-        return BaseResponse(return_code=1, message=e)
+        return BaseResponse(return_code=1, message=str(e))
 
     
     #トリミング
@@ -221,7 +221,7 @@ def shoot_target_site(file: UploadFile, site_id: int):
         hit_point_list = detectHitPointService.detectHitInfo(
         image=original_image, pt_list=pt_list)
     except Exception as e:
-        return BaseResponse(return_code=1, message=e)       
+        return BaseResponse(return_code=1, message=str(e))       
 
     if len(hit_point_list) == 0:
         return BaseResponse(return_code=1, message="ヒットポイントが見つかりませんでした。")  
