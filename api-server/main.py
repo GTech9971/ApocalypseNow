@@ -216,11 +216,15 @@ def shoot_target_site(file: UploadFile, site_id: int):
     # 新規サイトアップロード時の画像を読み込んでヒットポイント解析に使用する
     original_image:cv2.Mat = cv2.imread(targetSite.img_path)
 
+    hit_point_list: list[TargetSiteHitPoint] = []
     try:
-        hit_point_list: list[TargetSiteHitPoint] = detectHitPointService.detectHitInfo(
+        hit_point_list = detectHitPointService.detectHitInfo(
         image=original_image, pt_list=pt_list)
     except Exception as e:
-        return BaseResponse(return_code=1, message=e)        
+        return BaseResponse(return_code=1, message=e)       
+
+    if len(hit_point_list) == 0:
+        return BaseResponse(return_code=1, message="ヒットポイントが見つかりませんでした。")  
     
     # ヒットポイント座標、ヒットポイントをtarget_site_hit_pointsテーブルに記録
     targetSiteHitPointsDbService: TargetSiteHitPointsDbService = TargetSiteHitPointsDbService()
