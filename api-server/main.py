@@ -6,7 +6,7 @@ python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, Response
 
 import cv2
 import detect_targetsite
@@ -35,7 +35,8 @@ FILE = Path(__file__).resolve()
 # api-server root directory
 ROOT = FILE.parents[0]
 
-
+# アップロードされた画像データ
+UPLOAD_PREVIEW_IMAGE_PATH = Path(ROOT, "upload", "preview", "preview-image.jpg")
 # アップロードされた的本体の画像データ
 UPLOAD_TARGETSITE_PATH = Path(ROOT, "upload", "targetsite")
 # アップロードされた的の画像データ
@@ -85,6 +86,34 @@ def fetch_all_target_site():
     site_list:list[TargetSite] = targetSiteDbservice.fetchAllTargetSite()
 
     return FetchAllTargetSieResponse(return_code=0, message="", target_site_list=site_list)
+
+@app.post("/upload_preview_image")
+def upload_preview_image(file: UploadFile):
+    """
+    プレビュー画像を保存する
+    """
+     # 画像ファイルの保存    
+    try:
+        ImageUtils.saveImg(file, UPLOAD_PREVIEW_IMAGE_PATH)
+        return BaseResponse(return_code=0, message="")
+    except Exception as e:
+        return BaseResponse(return_code=1, message=str(e))
+
+
+@app.get("/fetch_preview_image")
+def fetch_preview_image():
+    """
+    プレビュー画像を返す
+    """
+    if not UPLOAD_PREVIEW_IMAGE_PATH.exists():
+        return Response(status_code=404)
+
+    try:
+        img:cv2.Mat = cv2.imread(UPLOAD_PREVIEW_IMAGE_PATH)
+        return Response(content=img.tobytes(), status_code=200, media_type="image/jpg")
+    except Exception as e:
+        return Response(str(e), status_code=404)
+    
 
 @app.post("/upload_original_target_site")
 def upload_original_target_site(file: UploadFile):
