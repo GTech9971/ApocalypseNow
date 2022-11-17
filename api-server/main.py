@@ -7,6 +7,7 @@ python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, Response
+from fastapi.responses import FileResponse
 
 import cv2
 import detect_targetsite
@@ -108,11 +109,8 @@ def fetch_preview_image():
     if not UPLOAD_PREVIEW_IMAGE_PATH.exists():
         return Response(status_code=404)
 
-    try:
-        img:cv2.Mat = cv2.imread(UPLOAD_PREVIEW_IMAGE_PATH)
-        return Response(content=img.tobytes(), status_code=200, media_type="image/jpg")
-    except Exception as e:
-        return Response(str(e), status_code=404)
+    return FileResponse(UPLOAD_PREVIEW_IMAGE_PATH)
+    
     
 
 @app.post("/upload_original_target_site")
