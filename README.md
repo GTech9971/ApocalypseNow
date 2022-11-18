@@ -9,18 +9,28 @@
 
 ## Dockerでyolov5(GPU)
 ### 1.Nvidia Driverのインストール
-以下のURLにアクセスしてPCに搭載しているGPUのドライバーをインストールする
+
+#### Windows10 (WSL)
+- 以下のURLにアクセスしてPCに搭載しているGPUのドライバーをインストールする
 [https://www.nvidia.com/Download/index.aspx](https://www.nvidia.com/Download/index.aspx)
 
-*Linux(Ubuntu)の場合、`ソフトウェアとアップデート`の`追加のドライバー`の以下を選択して適応後に再起動した。
-
-
-`NVIDIA driver metapackageをnvidia-driver-520から使用します（プロプライエタリ）`
-
-*一番上の(open kernel)のやつは、うまくドライバーが動かなかったので注意
-
-*WSLを使用してもドライバーは、Windows用をインストールすればよい。
+##### 注意点
+- Geforce Expreenceをインストールしている場合は、そちらからのドライバーのインストールで問題ない。
+- WSLを使用してもドライバーは、Windows用をインストールすればよい。
 [参考ページ](https://blog.shikoan.com/wsl2-ndivid-docker-pytorch/#:~:text=%E3%81%AE%E3%82%AA%E3%83%9A%E3%83%AC%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%81%AF%E3%80%81-,WSL%E3%82%92%E4%BD%BF%E3%81%86%E5%A0%B4%E5%90%88%E3%81%A7%E3%82%82Windows,-%E3%81%AB%E3%81%97%E3%81%BE%E3%81%97%E3%82%87%E3%81%86)
+
+#### Ubuntu 22.04 LTS
+- Linux(Ubuntu)の場合、`ソフトウェアとアップデート`の`追加のドライバー`の以下を選択して適応後に再起動した。
+
+- `NVIDIA driver metapackageをnvidia-driver-520から使用します（プロプライエタリ）`
+
+##### 注意点
+- 一番上の(open kernel)のやつは、うまくドライバーが動かなかったので注意
+
+- ubuntuに[cuda](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)をインストールしたが、必要だったかはわからない。
+- ubuntuにdocker desktopをインストールしたが、gpuを使用するコンテナがうまく起動しなかった。desktopを消して、docker-cliで実行したところ動いたので、linuxでdocker desktopの使用は様子見したほうが良い。
+
+
 
 ### 2.Docker Engineのインストール
 以下のURLを参考にする
