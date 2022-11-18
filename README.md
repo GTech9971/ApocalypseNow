@@ -12,13 +12,12 @@
 以下のURLにアクセスしてPCに搭載しているGPUのドライバーをインストールする
 [https://www.nvidia.com/Download/index.aspx](https://www.nvidia.com/Download/index.aspx)
 
-*Linuxの場合、ダウンロードしてきたドライバ名.runをインストールする
-以下のコマンドを実行する。
+*Linux(Ubuntu)の場合、`ソフトウェアとアップデート`の`追加のドライバー`の以下を選択して適応後に再起動した。
 
-```
-chmod +x ドライバ名.run
-sudo ./ドライバ名.run
-```
+
+`NVIDIA driver metapackageをnvidia-driver-520から使用します（プロプライエタリ）`
+
+*一番上の(open kernel)のやつは、うまくドライバーが動かなかったので注意
 
 *WSLを使用してもドライバーは、Windows用をインストールすればよい。
 [参考ページ](https://blog.shikoan.com/wsl2-ndivid-docker-pytorch/#:~:text=%E3%81%AE%E3%82%AA%E3%83%9A%E3%83%AC%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%81%AF%E3%80%81-,WSL%E3%82%92%E4%BD%BF%E3%81%86%E5%A0%B4%E5%90%88%E3%81%A7%E3%82%82Windows,-%E3%81%AB%E3%81%97%E3%81%BE%E3%81%97%E3%82%87%E3%81%86)
