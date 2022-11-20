@@ -144,8 +144,8 @@ def upload_original_target_site(file: UploadFile):
     detect_targetsite.run(weights=TARGET_SITE_WEIGHT_PATH,
                           source=save_path, save_txt=True, exist_ok=True)
     # 出力結果を読み取る
-    label_path = Path(ROOT, "runs/detect/exp/labels/",
-                      file.filename.replace(".png", ".txt"))
+    file_name:str = file.filename.replace(".png",".txt").replace(".jpg",".txt").replace(".JPG", ".txt")
+    label_path = Path(ROOT, "runs/detect/exp/labels/", file_name)
     
     # 未検出の場合、画像を別フォルダに保存し、dbに記録する
     if not label_path.exists():
@@ -224,8 +224,8 @@ def shoot_target_site(file: UploadFile, site_id: int):
     cv2.imwrite(save_path, image)
     
     # ヒットポイントの解析
-    label_path = Path(ROOT, "runs/detect/exp_site/labels/",
-                      file.filename.replace(".png", ".txt"))
+    file_name:str = file.filename.replace(".png",".txt").replace(".jpg",".txt").replace(".JPG", ".txt")
+    label_path = Path(ROOT, "runs/detect/exp_site/labels/", file_name)
 
     # ファイルが重複するので、古いファイルを削除する
     if label_path.exists():
@@ -280,28 +280,29 @@ def shoot_target_site(file: UploadFile, site_id: int):
     return ShootTargetSiteResponse(return_code=0, message="", site_id=site_id, hit_point_list=hit_point_list)
 
 @app.post("/do_command")
-def shoot_target_site(site_command: SiteCommand):
+def do_command(site_id: int, command_id:int):
     """
     サイトコマンドをdbに記録する
     """
     siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
+    site_command:SiteCommand = SiteCommand(id=-1, site_id=site_id, command_id=command_id)
     siteCommandsDbService.doCommand(site_command=site_command)
     return BaseResponse(return_code=0, message="")
 
-@app.get("/fetch_command")
+@app.get("/fetch_commands")
 def fetch_command(site_id:int):
     """
     サイトコマンドをdbから取得する
     """
     siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
-    site_command:SiteCommand = siteCommandsDbService.fetchCommand(site_id=site_id)
-    return FetchSiteCommandResponse(return_code=0, message="", site_command=site_command)
+    command_list:list[SiteCommand] = siteCommandsDbService.fetchCommand(site_id=site_id)
+    return FetchSiteCommandResponse(return_code=0, message="", command_list=command_list)
 
 @app.post("/done_command")
-def done_command(site_command:SiteCommand):
+def done_command(site_command_id:int):
     """
     サイトコマンドの終了処理を行う
     """
     siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
-    siteCommandsDbService.doneCommand(site_command=site_command)
+    siteCommandsDbService.doneCommand(site_command_id==site_command_id)
     return BaseException(return_code=0, message="")

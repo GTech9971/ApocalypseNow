@@ -27,15 +27,14 @@ class SiteCommandsDbService(DbConnector):
         cursor.close()
         con.close()
         
-    def fetchCommand(self, site_id:int) -> SiteCommand:
+    def fetchCommand(self, site_id:int) -> list[SiteCommand]:
         """
         ビュワーからのコマンドを取得する
         """
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = f"""SELECT target_site_id, command_id, created_at FROM site_commands WHERE target_site_id = {site_id} AND
-                    created_at = (SELECT MAX(created_at) FROM site_commands WHERE target_site_id = {site_id});"""
+        sql = f"SELECT id, target_site_id, command_id, created_at FROM site_commands WHERE target_site_id = {site_id};"
         cursor.execute(sql)
 
         rows = cursor.fetchall()
@@ -43,25 +42,26 @@ class SiteCommandsDbService(DbConnector):
         cursor.close()
         con.close()
 
-        site_command:SiteCommand = None
+        command_list:list[SiteCommand] = []
         for row in rows:
             if row[0] is None:
-                return None
-            target_site_id, command_id, created_at = row
-            site_command = SiteCommand(target_site_id, command_id)
+                return []
+            id, target_site_id, command_id, created_at = row
+            site_command = SiteCommand(id, target_site_id, command_id)
             site_command.created_at = created_at
+
+            command_list.append(site_command)
             
-        return site_command
+        return command_list
     
-    def doneCommand(self, site_command:SiteCommand):
+    def doneCommand(self, site_command_id:int):
         """
             コマンドの完了処理を行う
         """
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = f"""DELETE FROM site_commands WHERE = 
-                target_site_id = {site_command.site_id} AND command_id = {site_command.command_id} AND created_at = {site_command.created_at};"""
+        sql = f"DELETE FROM site_commands WHERE id = {site_command_id}"
         cursor.execute(sql)
 
         cursor.close()
