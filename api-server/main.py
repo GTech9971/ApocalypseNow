@@ -21,16 +21,19 @@ from entities.BaseResponse import BaseResponse
 from entities.FetchAllTargetSiteResponse import FetchAllTargetSieResponse
 from entities.UploadOriginalTargetSiteResponse import UploadOriginalTargetSiteResponse
 from entities.ShootTargetSiteResponse import ShootTargetSiteResponse
+from entities.FetchSiteCommandResponse import FetchSiteCommandResponse
 
 from entities.DetectInfo import DetectInfo
 from entities.Point import Point
 from entities.TargetSite import TargetSite
 from entities.TargetSiteHitPoint import TargetSiteHitPoint
 from entities.UnDetectTargetSite import UnDetectTargetSite
+from entities.SiteCommand import SiteCommand
 
 from services.ap2n.TargetSitesDbService import TargetSitesDbService
 from services.ap2n.TargetSiteHitPointsDbService import TargetSiteHitPointsDbService
 from services.ap2n.UnDetectTargetSitesDbService import UnDetectTargetSitesDbService
+from services.ap2n.SiteCommandsDbService import SiteCommandsDbService
 
 FILE = Path(__file__).resolve()
 # api-server root directory
@@ -275,3 +278,30 @@ def shoot_target_site(file: UploadFile, site_id: int):
     targetSiteDbservice.recordHitImagePath(site_id=site_id, hit_img_path=save_path)
 
     return ShootTargetSiteResponse(return_code=0, message="", site_id=site_id, hit_point_list=hit_point_list)
+
+@app.post("/do_command")
+def shoot_target_site(site_command: SiteCommand):
+    """
+    サイトコマンドをdbに記録する
+    """
+    siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
+    siteCommandsDbService.doCommand(site_command=site_command)
+    return BaseResponse(return_code=0, message="")
+
+@app.get("/fetch_command")
+def fetch_command(site_id:int):
+    """
+    サイトコマンドをdbから取得する
+    """
+    siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
+    site_command:SiteCommand = siteCommandsDbService.fetchCommand(site_id=site_id)
+    return FetchSiteCommandResponse(return_code=0, message="", site_command=site_command)
+
+@app.post("/done_command")
+def done_command(site_command:SiteCommand):
+    """
+    サイトコマンドの終了処理を行う
+    """
+    siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
+    siteCommandsDbService.doneCommand(site_command=site_command)
+    return BaseException(return_code=0, message="")
