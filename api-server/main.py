@@ -309,4 +309,4 @@ def done_command(site_command_id:int):
     """
     siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
     siteCommandsDbService.doneCommand(site_command_id==site_command_id)
-    return BaseException(return_code=0, message="")
+    return BaseResponse(return_code=0, message="")
