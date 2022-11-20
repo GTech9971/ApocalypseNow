@@ -308,5 +308,5 @@ def done_command(site_command_id:int):
     サイトコマンドの終了処理を行う
     """
     siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
-    siteCommandsDbService.doneCommand(site_command_id==site_command_id)
+    siteCommandsDbService.doneCommand(site_command_id=site_command_id)
     return BaseResponse(return_code=0, message="")

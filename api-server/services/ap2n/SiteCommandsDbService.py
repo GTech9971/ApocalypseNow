@@ -62,7 +62,7 @@ class SiteCommandsDbService(DbConnector):
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = f"DELETE FROM site_commands WHERE id = {site_command_id}"
+        sql = f"DELETE FROM site_commands WHERE id = {site_command_id};"
         cursor.execute(sql)
         con.commit()
 
