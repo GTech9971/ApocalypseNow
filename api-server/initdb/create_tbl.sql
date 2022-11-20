@@ -37,11 +37,6 @@ CREATE TABLE command_masters(
     created_at DATETIME
 );
 
-/** コマンドを追加 */
-INSERT INTO command_masters(id, command_desc, created_at) VALUES(0, 'ターゲットサイト画像確定', NOW());
-INSERT INTO command_masters(id, command_desc, created_at) VALUES(1, '射撃実行', NOW());
-
-
 /** ビュワーからのコマンドを記録 */
 CREATE TABLE site_commands(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -54,3 +49,7 @@ CREATE TABLE site_commands(
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+/** コマンドを追加 */
+INSERT INTO command_masters(id, command_desc, created_at) VALUES(0, 'ターゲットサイト画像確定', NOW());
+INSERT INTO command_masters(id, command_desc, created_at) VALUES(1, '射撃実行', NOW());
