@@ -42,6 +42,7 @@ CREATE TABLE site_commands(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     target_site_id INT NOT NULL,
     command_id INT NOT NULL,
+    created_at DATETIME,
     FOREIGN KEY (target_site_id) REFERENCES target_sites(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
