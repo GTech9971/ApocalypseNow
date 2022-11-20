@@ -283,6 +283,7 @@ def shoot_target_site(file: UploadFile, site_id: int):
 def do_command(site_id: int, command_id:int):
     """
     サイトコマンドをdbに記録する
+    site_idが未確定の場合、site_id=-1で登録する
     """
     siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
     site_command:SiteCommand = SiteCommand(id=-1, site_id=site_id, command_id=command_id)

@@ -17,11 +17,18 @@ class SiteCommandsDbService(DbConnector):
     def doCommand(self, site_command:SiteCommand):
         """
         ビュワーのコマンドを記録する
+        サイトIDが未確定の場合は、site_id = -1で登録する
         """
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = f"INSERT INTO site_commands(target_site_id, command_id, created_at) VALUES({site_command.site_id}, {site_command.command_id}, NOW());"
+        sql:str = ""
+        # ターゲットサイト確定コマンドなどはサイトIDが決まっていない場合がある
+        if site_command.site_id is None:
+            sql = f"INSERT INTO site_commands(target_site_id, command_id, created_at) VALUES(-1, {site_command.command_id}, NOW());"
+        else:
+            sql = f"INSERT INTO site_commands(target_site_id, command_id, created_at) VALUES({site_command.site_id}, {site_command.command_id}, NOW());"
+        
         cursor.execute(sql)
         con.commit()
 

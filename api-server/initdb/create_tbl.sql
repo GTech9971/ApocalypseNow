@@ -40,12 +40,13 @@ CREATE TABLE command_masters(
 /** ビュワーからのコマンドを記録 */
 CREATE TABLE site_commands(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    -- target_site_id INT NOT NULL,                                 サイト未確定の場合の考慮漏れのためコメントアウト
     target_site_id INT NOT NULL,
     command_id INT NOT NULL,
     created_at DATETIME,
-    FOREIGN KEY (target_site_id) REFERENCES target_sites(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
+    -- FOREIGN KEY (target_site_id) REFERENCES target_sites(id)     サイト未確定の場合の考慮漏れのためコメントアウト
+    --     ON UPDATE CASCADE
+    --     ON DELETE CASCADE,
     FOREIGN KEY (command_id) REFERENCES command_masters(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
