@@ -23,6 +23,7 @@ class SiteCommandsDbService(DbConnector):
 
         sql = f"INSERT INTO site_commands(target_site_id, command_id, created_at) VALUES({site_command.site_id}, {site_command.command_id}, NOW());"
         cursor.execute(sql)
+        con.commit()
 
         cursor.close()
         con.close()
@@ -35,7 +36,7 @@ class SiteCommandsDbService(DbConnector):
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
         sql = f"SELECT id, target_site_id, command_id, created_at FROM site_commands WHERE target_site_id = {site_id};"
-        cursor.execute(sql)
+        cursor.execute(sql)                    
 
         rows = cursor.fetchall()
 
@@ -63,6 +64,7 @@ class SiteCommandsDbService(DbConnector):
 
         sql = f"DELETE FROM site_commands WHERE id = {site_command_id}"
         cursor.execute(sql)
+        con.commit()
 
         cursor.close()
         con.close()

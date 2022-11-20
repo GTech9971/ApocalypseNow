@@ -286,8 +286,12 @@ def do_command(site_id: int, command_id:int):
     """
     siteCommandsDbService:SiteCommandsDbService = SiteCommandsDbService()
     site_command:SiteCommand = SiteCommand(id=-1, site_id=site_id, command_id=command_id)
-    siteCommandsDbService.doCommand(site_command=site_command)
-    return BaseResponse(return_code=0, message="")
+    try:
+        siteCommandsDbService.doCommand(site_command=site_command)
+        return BaseResponse(return_code=0, message="")
+    except Exception as e:
+        return BaseResponse(return_code=1, message=str(e))
+    
 
 @app.get("/fetch_commands")
 def fetch_command(site_id:int):

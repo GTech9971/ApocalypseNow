@@ -52,5 +52,6 @@ CREATE TABLE site_commands(
 );
 
 /** コマンドを追加 */
-INSERT INTO command_masters(id, command_desc, created_at) VALUES(0, 'ターゲットサイト画像確定', NOW());
-INSERT INTO command_masters(id, command_desc, created_at) VALUES(1, '射撃実行', NOW());
+INSERT INTO command_masters(command_desc, created_at) VALUES
+    ('ターゲットサイト画像確定', NOW()),
+    ('射撃実行', NOW());
