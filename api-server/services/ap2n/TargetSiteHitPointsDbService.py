@@ -48,7 +48,7 @@ class TargetSiteHitPointsDbService(DbConnector):
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = f"SELECT target_site_id, x, y, hit_point, created_at FROM target_site_hit_point WHERE target_site_id = {site_id};"
+        sql = f"SELECT target_site_id, x, y, hit_point, created_at FROM target_site_hit_points WHERE target_site_id = {site_id};"
         cursor.execute(sql)
         rows = cursor.fetchall()
 
