@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, Response
 from fastapi.responses import FileResponse
+from starlette.websockets import WebSocket
 
 import cv2
 import detect_targetsite
@@ -305,6 +306,31 @@ def fetch_target_site_hit_point(site_id: int):
         site_id=site_id)
 
     return FetchTargetSiteHitPoint(return_code=0, message="", ht_list=ht_list)
+
+
+# 接続中のクライアントを識別するためのIDを格納
+clients = {}
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(ws: WebSocket):
+    await ws.accept()
+    # クライアントを識別するためのIDを取得
+    key = ws.headers.get('sec-websocket-key')
+    clients[key] = ws
+    try:
+        while True:
+            # クライアントからメッセージを受信
+            data: str = await ws.receive_text()
+            # 接続中のクライアントそれぞれにメッセージを送信（ブロードキャスト）
+            for client in clients.values():
+                text: str = f"ID: {key} | Message: {data}"
+                await client.send_text(text)
+                print(text)
+    except:
+        await ws.close()
+        # 接続が切れた場合、当該クライアントを削除する
+        del clients[key]
 
 
 @app.post("/do_command")
