@@ -327,10 +327,12 @@ async def websocket_endpoint(ws: WebSocket):
                 text: str = f"ID: {key} | Message: {data}"
                 await client.send_text(text)
                 print(text)
-    except:
-        await ws.close()
-        # 接続が切れた場合、当該クライアントを削除する
-        del clients[key]
+    except Exception as e:
+        # await ws.close()
+        # # 接続が切れた場合、当該クライアントを削除する
+        # del clients[key]
+        # TODO 上記の記載の場合、メッセージ受信後、勝手に切断されるので、コメントアウト
+        print(e)
 
 
 @app.post("/do_command")
