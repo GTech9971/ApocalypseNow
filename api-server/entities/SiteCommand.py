@@ -13,3 +13,4 @@ class SiteCommand(object):
         self.site_id = site_id
         self.command_id = command_id
         self.created_at = None
+        self.is_done = False

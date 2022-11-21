@@ -7,69 +7,85 @@ from services.ap2n.DbConnector import DbConnector
 
 from entities.SiteCommand import SiteCommand
 
+
 class SiteCommandsDbService(DbConnector):
     """
     site_commandsテーブルの操作を行う
     """
+
     def __init__(self) -> None:
         super().__init__()
-    
-    def doCommand(self, site_command:SiteCommand):
+
+    def doCommand(self, site_command: SiteCommand) -> int:
         """
         ビュワーのコマンドを記録する
         サイトIDが未確定の場合は、site_id = -1で登録する
+        @return
+            新しく登録したサイトコマンドid
         """
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql:str = ""
+        sql: str = ""
         # ターゲットサイト確定コマンドなどはサイトIDが決まっていない場合がある
         if site_command.site_id is None:
             sql = f"INSERT INTO site_commands(target_site_id, command_id, created_at) VALUES(-1, {site_command.command_id}, NOW());"
         else:
             sql = f"INSERT INTO site_commands(target_site_id, command_id, created_at) VALUES({site_command.site_id}, {site_command.command_id}, NOW());"
-        
+
         cursor.execute(sql)
         con.commit()
 
+        site_command_id: int = int(cursor.lastrowid)
+
         cursor.close()
         con.close()
-        
-    def fetchCommand(self, site_id:int) -> list[SiteCommand]:
+
+        return site_command_id
+
+    def fetchCommand(self, site_id: int) -> list[SiteCommand]:
         """
-        ビュワーからのコマンドを取得する
+        ビュワーから未実行のコマンドを取得する
         """
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
 
-        sql = f"SELECT id, target_site_id, command_id, created_at FROM site_commands WHERE target_site_id = {site_id};"
-        cursor.execute(sql)                    
+        sql = f"SELECT id, target_site_id, command_id, created_at, is_done FROM site_commands WHERE target_site_id = {site_id} AND is_done = false;"
+        cursor.execute(sql)
 
         rows = cursor.fetchall()
 
         cursor.close()
         con.close()
 
-        command_list:list[SiteCommand] = []
+        command_list: list[SiteCommand] = []
         for row in rows:
             if row[0] is None:
                 return []
-            id, target_site_id, command_id, created_at = row
+            id, target_site_id, command_id, created_at, is_done = row
             site_command = SiteCommand(id, target_site_id, command_id)
             site_command.created_at = created_at
+            site_command.is_done = is_done
 
             command_list.append(site_command)
-            
+
         return command_list
-    
-    def doneCommand(self, site_command_id:int):
+
+    def doneCommand(self, site_command_id: int, site_id: int = None):
         """
             コマンドの完了処理を行う
+            @params
+                site_command_id : 終了するコマンドid
+                site_id         : 更新するターゲットサイトID(*デフォルトはNone 値が指定された場合のみ更新する)
         """
         con = self.connect()
         cursor: MySQLdb.cursors.Cursor = con.cursor()
+        sql: str = ""
+        if site_id is None:
+            sql = f"UPDATE site_commands SET is_done = true WHERE id = {site_command_id};"
+        else:
+            sql = f"UPDATE site_commands SET is_done = true, target_site_id = {site_id} WHERE id = {site_command_id};"
 
-        sql = f"DELETE FROM site_commands WHERE id = {site_command_id};"
         cursor.execute(sql)
         con.commit()
 

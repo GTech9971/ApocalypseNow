@@ -44,6 +44,7 @@ CREATE TABLE site_commands(
     target_site_id INT NOT NULL,
     command_id INT NOT NULL,
     created_at DATETIME,
+    is_done BOOLEAN,
     -- FOREIGN KEY (target_site_id) REFERENCES target_sites(id)     サイト未確定の場合の考慮漏れのためコメントアウト
     --     ON UPDATE CASCADE
     --     ON DELETE CASCADE,
