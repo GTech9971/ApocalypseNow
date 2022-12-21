@@ -375,3 +375,70 @@ def done_command(site_command_id: int, site_id: int = None):
     siteCommandsDbService.doneCommand(
         site_command_id=site_command_id, site_id=site_id)
     return BaseResponse(return_code=0, message="")
+
+
+@app.post("/shoot_info")
+def shoot_target_site(file: UploadFile):
+    """
+        射撃後のサイトの画像を受信し、射撃座標の取得と点数をテーブルに記録し、返す
+        @param
+            file            : 射撃後の画像
+    """
+
+    # 画像ファイルの保存
+    save_path = Path(UPLOAD_SITE_PATH, file.filename)
+    try:
+        ImageUtils.saveImg(file, save_path)
+    except Exception as e:
+        return BaseResponse(return_code=1, message=str(e))
+
+    # トリミング
+    image: cv2.Mat = cv2.imread(save_path)
+    cv2.imwrite(save_path, image)
+
+    # ヒットポイントの解析
+    file_name: str = file.filename.replace(".png", ".txt").replace(
+        ".jpg", ".txt").replace(".JPG", ".txt")
+    label_path = Path(ROOT, "runs/detect/exp_site/labels/", file_name)
+
+    # ファイルが重複するので、古いファイルを削除する
+    if label_path.exists():
+        label_path.rename(str(label_path) + ".old")
+
+    # yoloでヒットポイントの座標取得
+    detect_site.run(weights=SITE_WEIGHT_PATH, source=save_path,
+                    name="exp_site", save_txt=True, exist_ok=True, nosave=True)
+
+    if not label_path.exists():
+        return BaseResponse(return_code=1, message="ヒットポイントが見つかりませんでした。")
+
+    detect_list: list[DetectInfo] = DetectInfo.loadLabels(label_path)
+
+    # yoloで取得したx,y,w,h座標から中心地の座標(x,y)に変換する
+    pt_list: list[Point] = []
+    for detect in detect_list:
+        pt_list.append(detect.convert2CenterPoint())
+
+    # ヒットポイントの取得を行う
+    detectHitPointService: DetectHitPointService = DetectHitPointService(
+        site_id=-1)
+
+    hit_point_list: list[TargetSiteHitPoint] = []
+    try:
+        hit_point_list, img1 = detectHitPointService.detectHitInfo(
+            image=image, pt_list=pt_list)
+        # 輪郭を塗った画像の保存
+        draw_save_path: Path = Path(DRAW_CONTOURS_PATH, file.filename)
+        cv2.imwrite(draw_save_path, img1)
+
+        # 射撃位置を塗った画像の保存
+        hit_point_path: Path = Path(DRAW_HIT_POINT_PATH, file.filename)
+        image = detectHitPointService.drawHitPoint(image, hit_point_list)
+        cv2.imwrite(hit_point_path, image)
+    except Exception as e:
+        return BaseResponse(return_code=1, message=str(e))
+
+    if len(hit_point_list) == 0:
+        return BaseResponse(return_code=1, message="ヒットポイントが見つかりませんでした。")
+
+    return ShootTargetSiteResponse(return_code=0, message="", site_id=-1, hit_point_list=hit_point_list)
