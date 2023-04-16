@@ -180,6 +180,21 @@ python train.py --img 640 --batch 16 --epochs 200 --data {sample.yamlのpath} --
 /usr/src/app/runs/train/exp/weights
 ```
 
+### tensorflowjsのモデルに変換
+先ほどの学習でptファイルが保存されたので、それを使用して以下のコマンドを実行しtensorflowjsのモデルに変換する
+
+https://qiita.com/shinya_sun_sun/items/24beca88a497df8e7c2d
+
+```
+python export.py --weights 学習結果.pt --include tfjs
+```
+するとappフォルダ直下に以下の結果フォルダが生成される
+(失敗した場合、もう一回実行すればうまくいった)
+
+```
+/usr/src/app/学習結果_web_model
+```
+
 ## yolov5 識別
 ### 画像の識別
 先ほどの学習でptファイルが保存されたので、それを使用して以下のコマンドを実行する
